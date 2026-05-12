@@ -1,39 +1,59 @@
-This is a Kotlin Multiplatform project targeting Android, iOS.
+# Vora
 
-* [/composeApp](./composeApp/src) is for code that will be shared across your Compose Multiplatform applications.
-  It contains several subfolders:
-  - [commonMain](./composeApp/src/commonMain/kotlin) is for code that’s common for all targets.
-  - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name.
-    For example, if you want to use Apple’s CoreCrypto for the iOS part of your Kotlin app,
-    the [iosMain](./composeApp/src/iosMain/kotlin) folder would be the right place for such calls.
-    Similarly, if you want to edit the Desktop (JVM) specific part, the [jvmMain](./composeApp/src/jvmMain/kotlin)
-    folder is the appropriate location.
+Vora is a multiplatform voice memo app focused on fast capture, calm playback, and native behavior across handheld, wearable, and automotive surfaces.
 
-* [/iosApp](./iosApp/iosApp) contains iOS applications. Even if you’re sharing your UI with Compose Multiplatform,
-  you need this entry point for your iOS app. This is also where you should add SwiftUI code for your project.
+## Supported Platforms
 
-* [/shared](./shared/src) is for the code that will be shared between all targets in the project.
-  The most important subfolder is [commonMain](./shared/src/commonMain/kotlin). If preferred, you
-  can add code to the platform-specific folders here too.
+- Android mobile
+- iPhone
+- Wear OS
+- Apple Watch
+- Android Auto
+- CarPlay later
 
-### Build and Run Android Application
+## Architecture Summary
 
-To build and run the development version of the Android app, use the run configuration from the run widget
-in your IDE’s toolbar or build it directly from the terminal:
-- on macOS/Linux
-  ```shell
-  ./gradlew :composeApp:assembleDebug
-  ```
-- on Windows
-  ```shell
-  .\gradlew.bat :composeApp:assembleDebug
-  ```
+- `shared` holds business models, repository contracts, use cases, and shared rules.
+- `composeApp` is the Android mobile application.
+- `iosApp` contains iPhone and Apple Watch native entry points.
+- `wearApp` contains Wear OS-specific UI and integrations.
+- `carApp` contains Android Auto playback-first work.
 
-### Build and Run iOS Application
+## Current Status
 
-To build and run the development version of the iOS app, use the run configuration from the run widget
-in your IDE’s toolbar or open the [/iosApp](./iosApp) directory in Xcode and run it from there.
+The repository is in foundation setup. Architecture, rules, roadmap, and design guidance are defined before feature implementation.
 
----
+## Setup Notes
 
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html)…
+- Android builds use Gradle from the project root.
+- iOS and Apple Watch targets are managed through Xcode in `iosApp`.
+- Local platform SDK setup is still required for running apps on devices or simulators.
+
+## Development Priorities
+
+1. Fast local capture
+2. Reliable local playback
+3. Offline-first storage
+4. Native UX on each platform
+5. Clean cross-platform architecture
+
+## AI Project Files
+
+- [AGENTS.md](./AGENTS.md): agent ownership and review contract
+- [RULES.md](./RULES.md): enforceable engineering rules
+- [ARCHITECTURE.md](./ARCHITECTURE.md): module boundaries and dependency direction
+- [MVP.md](./MVP.md): first buildable scope
+- [ROADMAP.md](./ROADMAP.md): phased delivery plan
+- [DESIGN.md](./DESIGN.md): design tokens and interaction guidance
+
+## Build Notes
+
+Examples:
+
+```bash
+./gradlew :composeApp:assembleDebug
+./gradlew :wearApp:assembleDebug
+./gradlew :carApp:assembleDebug
+```
+
+Open `iosApp` in Xcode for iPhone and Apple Watch targets.
