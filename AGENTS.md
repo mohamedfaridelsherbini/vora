@@ -14,6 +14,25 @@ This file defines how coding agents operate in Vora. It is a delivery contract f
 | Product priorities | Fast capture, low friction, offline-first behavior, native UX, scalable architecture |
 | Root modules | `shared`, `composeApp`, `iosApp`, `wearApp`, `carApp` |
 
+## Typography
+
+| Item | Value |
+| --- | --- |
+| Typeface | Inter |
+| Source | Variable fonts — `Inter-VariableFont_opsz,wght.ttf` and `Inter-Italic-VariableFont_opsz,wght.ttf` |
+| Compose Multiplatform | `composeApp/src/commonMain/composeResources/font/inter_variable.ttf` and `inter_variable_italic.ttf` |
+| Wear OS | `wearApp/src/main/res/font/` — static 18pt cuts: Regular, Light, Medium, SemiBold, Bold (+ italic variants) |
+| Car App | `carApp/src/main/res/font/` — static 18pt cuts: Regular, Medium, SemiBold, Bold; font family XML at `inter_font_family.xml` |
+| iOS | `iosApp/iosApp/Fonts/` — variable fonts; registered in `iosApp/Info.plist` via `UIAppFonts`; Swift API in `presentation/theme/Typography.swift` |
+| Apple Watch | `iosApp/VoraWatch Watch App/Fonts/` — variable fonts; registered in `VoraWatch Watch App/Info.plist`; Swift API in `Typography.swift` |
+
+**Font usage rules:**
+- Compose Multiplatform: use `voraTypography()` (composable) — never hard-code `FontFamily.Default`.
+- Wear OS: `InterFontFamily` + `VoraWearTypography` wired into `VoraTheme` — already applied in `WearEntryActivity`.
+- Car App: `@font/inter_font_family` declared in `Theme.Vora` — inherited by all XML views.
+- iOS/watchOS: use `Font.voraBody`, `Font.voraTitle`, etc. from the `Typography.swift` extensions — never use system fonts or hard-coded sizes.
+- Do not introduce a second typeface. All type is Inter across every surface.
+
 ## Global Agent Rules
 
 - Prefer the smallest compliant change.

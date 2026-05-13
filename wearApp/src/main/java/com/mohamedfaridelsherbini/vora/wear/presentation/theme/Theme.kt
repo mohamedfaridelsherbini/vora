@@ -7,11 +7,8 @@ import androidx.wear.compose.material3.MaterialTheme
 fun VoraTheme(
     content: @Composable () -> Unit
 ) {
-    /**
-     * Empty theme to customize for your app.
-     * See: https://developer.android.com/jetpack/compose/designsystems/custom
-     */
     MaterialTheme(
+        typography = VoraWearTypography,
         content = content
     )
 }
