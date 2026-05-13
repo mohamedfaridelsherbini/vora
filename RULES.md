@@ -4,6 +4,28 @@
 
 These rules are mandatory. A change that violates them should be rejected rather than explained away.
 
+## Communication Efficiency Rules
+
+- Prefer the smallest sufficient response.
+- Do not restate the user prompt.
+- Do not explain obvious steps unless asked.
+- Do not output long plans when a short action list is enough.
+- Do not summarize unchanged files or unchanged code.
+- When reporting work, describe only what changed, why it changed, and any blocker or risk.
+- Use bullets only when they improve clarity.
+- Avoid repeated warnings, repeated summaries, and generic best-practice filler.
+- For simple tasks, answer in one to three short paragraphs or a short list.
+- For implementation requests, do the work first and explain briefly after.
+- Ask at most one clarifying question unless more are strictly necessary.
+- Prefer exact file references and concrete changes over narrative explanation.
+
+Do not:
+
+- repeat the same point in multiple sections
+- produce a plan unless the task is ambiguous, risky, or explicitly asks for one
+- expand a short answer into a framework or taxonomy the user did not ask for
+- include low-signal recap when the result is already clear
+
 ## Kotlin Rules
 
 - Use `val` by default.
