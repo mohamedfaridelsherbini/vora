@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="vora_blue">#2563EB</color>
+    <color name="vora_charcoal">#111827</color>
+    <color name="vora_line">#E5E7EB</color>
+    <color name="vora_muted">#6B7280</color>
+    <color name="vora_paper">#F9FAFB</color>
+    <color name="vora_red">#DC2626</color>
+    <color name="vora_soft_blue">#DBEAFE</color>
+    <color name="vora_white">#FFFFFF</color>
+
+    <color name="color_canvas">#FFFFFF</color>
+    <color name="color_danger">#C95B4A</color>
+    <color name="color_neutral">#F4F7F8</color>
+    <color name="color_on_danger">#F4F7F8</color>
+    <color name="color_on_neutral">#14202A</color>
+    <color name="color_on_primary">#F4F7F8</color>
+    <color name="color_on_secondary">#F4F7F8</color>
+    <color name="color_on_surface_muted">#14202A</color>
+    <color name="color_on_tertiary">#F4F7F8</color>
+    <color name="color_primary">#14202A</color>
+    <color name="color_secondary">#5B6B75</color>
+    <color name="color_success">#2F6A4F</color>
+    <color name="color_surface_muted">#DDEBED</color>
+    <color name="color_tertiary">#2F6B73</color>
+    <color name="color_warning">#A06A1E</color>
+
+    <color name="logo_blue">#2563EB</color>
+    <color name="logo_charcoal">#111827</color>
+    <color name="logo_ink">#0B1220</color>
+    <color name="logo_paper">#F9FAFB</color>
+    <color name="logo_red">#DC2626</color>
+</resources>
