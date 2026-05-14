@@ -1,7 +1,19 @@
 {
   "images" : [
     {
-      "filename" : "AppIcon-watch-1024.png",
+      "filename" : "AppIcon-watch-light-1024.png",
+      "idiom" : "universal",
+      "platform" : "watchos",
+      "size" : "1024x1024"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "AppIcon-watch-dark-1024.png",
       "idiom" : "universal",
       "platform" : "watchos",
       "size" : "1024x1024"
