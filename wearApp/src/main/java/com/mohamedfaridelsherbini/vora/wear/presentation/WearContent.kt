@@ -122,3 +122,22 @@ private fun WearSplashScreenPreview() {
         WearSplashContent(state = WearSplashVisualState())
     }
 }
+
+@Preview
+@Composable
+private fun WearHomeContentPreview() {
+    VoraTheme {
+        WearHomeContent(state = WearHomeVisualState())
+    }
+}
+
+@Preview
+@Composable
+private fun WearPulseDotPreview() {
+    VoraTheme {
+        WearPulseDot(
+            alpha = 1f,
+            color = Color(0xFF2563EB),
+        )
+    }
+}

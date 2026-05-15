@@ -28,6 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
@@ -190,4 +191,59 @@ private fun FoundationPill(
             )
             .padding(horizontal = 12.dp, vertical = 8.dp),
     )
+}
+
+@Preview(name = "Phone Splash", showBackground = true, backgroundColor = 0xFFF9FAFB)
+@Composable
+private fun VoraSplashContentPreview() {
+    MaterialTheme {
+        VoraSplashContent(
+            state = SplashVisualState(
+                background = VoraColors.LogoPaper,
+                titleColor = VoraColors.LogoInk,
+                subtitleColor = VoraColors.VoraMuted,
+                dividerColor = Color(0xFFD8E4FF),
+                footerColor = VoraColors.VoraMuted.copy(alpha = 0.84f),
+            ),
+        )
+    }
+}
+
+@Preview(name = "Phone Home", showBackground = true, backgroundColor = 0xFFF9FAFB)
+@Composable
+private fun VoraHomeContentPreview() {
+    MaterialTheme {
+        VoraHomeContent(
+            state = HomeVisualState(
+                background = VoraColors.LogoPaper,
+                titleColor = VoraColors.LogoInk,
+                subtitleColor = VoraColors.VoraMuted,
+                pillTextColor = VoraColors.LogoInk,
+            ),
+        )
+    }
+}
+
+@Preview(name = "Foundation Pill", showBackground = true, backgroundColor = 0xFFF9FAFB)
+@Composable
+private fun FoundationPillPreview() {
+    MaterialTheme {
+        FoundationPill(
+            label = "Shared graph",
+            textColor = VoraColors.LogoInk,
+        )
+    }
+}
+
+@Preview(name = "Pulse Dots", showBackground = true, backgroundColor = 0xFFF9FAFB)
+@Composable
+private fun PulseDotsPreview() {
+    MaterialTheme {
+        PulseDots(
+            dotColor = VoraColors.LogoBlue,
+            alphaValues = listOf(1f, 0.8f, 0.55f),
+            dotSize = 6.dp,
+            spacing = 8.dp,
+        )
+    }
 }

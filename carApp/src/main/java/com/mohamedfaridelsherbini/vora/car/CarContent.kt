@@ -128,6 +128,41 @@ private fun CarPulseDots(
 }
 
 @Preview(
+    name = "Car Divider",
+    widthDp = 240,
+    heightDp = 80,
+    showBackground = true,
+    backgroundColor = 0xFF111827,
+)
+@Composable
+private fun CarSplashDividerPreview() {
+    MaterialTheme {
+        Surface {
+            CarSplashDivider(color = Color(0xFF24314F))
+        }
+    }
+}
+
+@Preview(
+    name = "Car Pulse Dots",
+    widthDp = 240,
+    heightDp = 80,
+    showBackground = true,
+    backgroundColor = 0xFF111827,
+)
+@Composable
+private fun CarPulseDotsPreview() {
+    MaterialTheme {
+        Surface {
+            CarPulseDots(
+                color = Color(0xFF2563EB),
+                alphaValues = listOf(1f, 0.78f, 0.56f),
+            )
+        }
+    }
+}
+
+@Preview(
     name = "Car Splash",
     widthDp = 1280,
     heightDp = 720,
