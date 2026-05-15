@@ -6,16 +6,41 @@ import androidx.compose.ui.graphics.Color
 import com.mohamedfaridelsherbini.vora.presentation.theme.VoraColors
 
 internal data class NoteListItemUi(
+    val id: String,
     val title: String,
     val time: String,
     val subtitle: String,
     val source: String,
 )
 
+internal data class NotesSourceFilterUi(
+    val key: String,
+    val label: String,
+    val count: Int,
+    val selected: Boolean,
+)
+
+internal enum class NotesListMode {
+    Loading,
+    Empty,
+    Loaded,
+}
+
+internal data class NotesUiState(
+    val mode: NotesListMode,
+    val summaryText: String,
+    val statusLabel: String,
+    val filters: List<NotesSourceFilterUi>,
+    val memos: List<NoteListItemUi>,
+)
+
 internal data class NotesListVisualState(
+    val mode: NotesListMode,
     val background: Color,
     val titleColor: Color,
     val subtitleColor: Color,
+    val summaryText: String,
+    val statusLabel: String,
     val statusChipBackground: Color,
     val statusChipTextColor: Color,
     val filterChipBackground: Color,
@@ -24,35 +49,93 @@ internal data class NotesListVisualState(
     val searchBorder: Color,
     val cardBackground: Color,
     val cardBorder: Color,
+    val emptyStateBackground: Color,
+    val emptyStateBorder: Color,
+    val emptyStateIconColor: Color,
     val metaColor: Color,
     val recordButtonBackground: Color,
     val recordButtonTextColor: Color,
+    val filters: List<NotesSourceFilterUi>,
     val memos: List<NoteListItemUi>,
 )
 
+internal fun NotesUiState.toVisualState(dark: Boolean): NotesListVisualState = NotesListVisualState(
+    mode = mode,
+    background = if (dark) VoraColors.LogoCharcoal else VoraColors.LogoPaper,
+    titleColor = if (dark) VoraColors.LogoPaper else VoraColors.LogoInk,
+    subtitleColor = if (dark) VoraColors.VoraMuted.copy(alpha = 0.72f) else VoraColors.VoraMuted,
+    summaryText = summaryText,
+    statusLabel = statusLabel,
+    statusChipBackground = when {
+        dark && statusLabel == "Syncing" -> Color(0xFF1D2736)
+        dark -> Color(0xFF2F6A4F)
+        statusLabel == "Syncing" -> Color(0xFFDDEBED)
+        else -> Color(0xFF3A7D58)
+    },
+    statusChipTextColor = when {
+        statusLabel == "Syncing" -> if (dark) VoraColors.LogoPaper else VoraColors.Tertiary
+        else -> VoraColors.LogoPaper
+    },
+    filterChipBackground = if (dark) Color(0xFF1D2736) else Color(0xFFEFF4F7),
+    filterChipTextColor = if (dark) VoraColors.LogoPaper else VoraColors.LogoInk,
+    searchBackground = if (dark) Color(0xFF1B2432) else VoraColors.VoraWhite,
+    searchBorder = if (dark) Color(0xFF24314F) else Color(0xFFE7EDF3),
+    cardBackground = if (dark) Color(0xFF161F2D) else VoraColors.VoraWhite,
+    cardBorder = if (dark) Color(0xFF202C3D) else Color(0xFFEDF2F5),
+    emptyStateBackground = if (dark) Color(0xFF161F2D) else Color(0xFFF7F9FB),
+    emptyStateBorder = if (dark) Color(0xFF202C3D) else Color(0xFFF0F3F6),
+    emptyStateIconColor = if (dark) Color(0xFFB8C1CD) else VoraColors.LogoInk.copy(alpha = 0.78f),
+    metaColor = if (dark) Color(0xFFB8C1CD) else VoraColors.VoraMuted,
+    recordButtonBackground = Color(0xFFEF2B2A),
+    recordButtonTextColor = VoraColors.VoraWhite,
+    filters = filters,
+    memos = memos,
+)
+
 @Composable
-internal fun notesListVisualState(): NotesListVisualState {
+internal fun notesListVisualState(uiState: NotesUiState): NotesListVisualState {
     val dark = isSystemInDarkTheme()
-    return NotesListVisualState(
-        background = if (dark) VoraColors.LogoCharcoal else VoraColors.LogoPaper,
-        titleColor = if (dark) VoraColors.LogoPaper else VoraColors.LogoInk,
-        subtitleColor = if (dark) VoraColors.VoraMuted.copy(alpha = 0.72f) else VoraColors.VoraMuted,
-        statusChipBackground = if (dark) Color(0xFF2F6A4F) else Color(0xFF3A7D58),
-        statusChipTextColor = VoraColors.LogoPaper,
-        filterChipBackground = if (dark) Color(0xFF1D2736) else Color(0xFFEFF4F7),
-        filterChipTextColor = if (dark) VoraColors.LogoPaper else VoraColors.LogoInk,
-        searchBackground = if (dark) Color(0xFF1B2432) else VoraColors.VoraWhite,
-        searchBorder = if (dark) Color(0xFF24314F) else Color(0xFFE7EDF3),
-        cardBackground = if (dark) Color(0xFF161F2D) else VoraColors.VoraWhite,
-        cardBorder = if (dark) Color(0xFF202C3D) else Color(0xFFEDF2F5),
-        metaColor = if (dark) Color(0xFFB8C1CD) else VoraColors.VoraMuted,
-        recordButtonBackground = Color(0xFFEF2B2A),
-        recordButtonTextColor = VoraColors.VoraWhite,
-        memos = listOf(
-            NoteListItemUi("Morning idea", "1:24", "Synced · Today, 8:42", "Phone"),
-            NoteListItemUi("Pickup notes", "0:48", "Queued · Today, 12:10", "Watch"),
-            NoteListItemUi("Project review", "2:48", "Failed · Yesterday, 9:15", "Car"),
-            NoteListItemUi("Grocery list", "0:22", "Mon, 19:02", "Phone"),
-        ),
-    )
+    return uiState.toVisualState(dark = dark)
 }
+
+internal fun previewLoadedNotesUiState(): NotesUiState = NotesUiState(
+    mode = NotesListMode.Loaded,
+    summaryText = "12 memos · 18 min",
+    statusLabel = "Synced",
+    filters = listOf(
+        NotesSourceFilterUi("all", "All", 12, true),
+        NotesSourceFilterUi("phone", "Phone", 7, false),
+        NotesSourceFilterUi("smart", "Smart", 3, false),
+        NotesSourceFilterUi("car", "Car", 2, false),
+    ),
+    memos = listOf(
+        NoteListItemUi("memo-morning-idea", "Morning idea", "1:24", "Synced · Today, 8:42", "Phone"),
+        NoteListItemUi("memo-pickup-notes", "Pickup notes", "0:48", "Queued · Today, 12:10", "Watch"),
+    ),
+)
+
+internal fun previewEmptyNotesUiState(): NotesUiState = NotesUiState(
+    mode = NotesListMode.Empty,
+    summaryText = "0 memos",
+    statusLabel = "Synced",
+    filters = listOf(
+        NotesSourceFilterUi("all", "All", 0, true),
+        NotesSourceFilterUi("phone", "Phone", 0, false),
+        NotesSourceFilterUi("smart", "Smart", 0, false),
+        NotesSourceFilterUi("car", "Car", 0, false),
+    ),
+    memos = emptyList(),
+)
+
+internal fun previewLoadingNotesUiState(): NotesUiState = NotesUiState(
+    mode = NotesListMode.Loading,
+    summaryText = "Loading local library",
+    statusLabel = "Syncing",
+    filters = listOf(
+        NotesSourceFilterUi("all", "All", 0, true),
+        NotesSourceFilterUi("phone", "Phone", 0, false),
+        NotesSourceFilterUi("smart", "Smart", 0, false),
+        NotesSourceFilterUi("car", "Car", 0, false),
+    ),
+    memos = emptyList(),
+)

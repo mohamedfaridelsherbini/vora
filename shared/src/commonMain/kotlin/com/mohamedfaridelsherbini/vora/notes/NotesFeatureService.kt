@@ -1,0 +1,99 @@
+package com.mohamedfaridelsherbini.vora.notes
+
+import com.mohamedfaridelsherbini.vora.di.VoiceMemoFeatureUseCases
+import com.mohamedfaridelsherbini.vora.domain.model.VoiceMemoSource
+import com.mohamedfaridelsherbini.vora.mock.VoiceMemoMockFactory
+import kotlinx.coroutines.flow.first
+
+class NotesFeatureService(
+    private val voiceMemoUseCases: VoiceMemoFeatureUseCases,
+    private val snapshotFactory: NotesSnapshotFactory,
+    private val voiceMemoMockFactory: VoiceMemoMockFactory,
+) {
+    private var selectedFilter = NotesSourceFilter.All
+
+    suspend fun loadSnapshot(): NotesSnapshot =
+        snapshotFactory.create(
+            memos = voiceMemoUseCases.observeVoiceMemos().first(),
+            selectedFilter = selectedFilter,
+        )
+
+    suspend fun insertMemo() {
+        val current = voiceMemoUseCases.observeVoiceMemos().first()
+        val nextIndex = (current.size + 1).coerceAtLeast(1)
+        val now = currentTimeMillis()
+        voiceMemoUseCases.upsertVoiceMemo(
+            voiceMemoMockFactory.quickMemo(
+                index = nextIndex,
+                createdAt = now,
+                source = VoiceMemoSource.Phone,
+                idSuffix = randomId(),
+            ),
+        )
+    }
+
+    suspend fun renameMemo(id: String) {
+        val current = voiceMemoUseCases.observeVoiceMemos().first()
+        val memo = current.firstOrNull { it.id == id } ?: return
+        voiceMemoUseCases.renameVoiceMemo(
+            id = id,
+            title = memo.title.toRenamedTitle(),
+        )
+    }
+
+    suspend fun deleteMemo(id: String) {
+        voiceMemoUseCases.deleteVoiceMemo(id)
+    }
+
+    fun selectSourceFilter(key: String) {
+        selectedFilter = NotesSourceFilter.fromKey(key)
+    }
+}
+
+data class NotesSnapshot(
+    val mode: NotesSnapshotMode,
+    val summaryText: String,
+    val statusLabel: String,
+    val selectedFilterKey: String,
+    val filters: List<NotesSourceFilterChip>,
+    val memos: List<NotesMemoItem>,
+)
+
+enum class NotesSnapshotMode {
+    Loading,
+    Empty,
+    Loaded,
+}
+
+data class NotesMemoItem(
+    val id: String,
+    val title: String,
+    val time: String,
+    val subtitle: String,
+    val source: String,
+)
+
+data class NotesSourceFilterChip(
+    val key: String,
+    val label: String,
+    val count: Int,
+    val selected: Boolean,
+)
+
+enum class NotesSourceFilter(
+    val key: String,
+    val label: String,
+) {
+    All(key = "all", label = "All"),
+    Phone(key = "phone", label = "Phone"),
+    Smart(key = "smart", label = "Smart"),
+    Car(key = "car", label = "Car");
+
+    companion object {
+        fun fromKey(key: String): NotesSourceFilter = entries.firstOrNull { it.key == key } ?: All
+    }
+}
+
+expect fun currentTimeMillis(): Long
+
+internal expect fun randomId(): String

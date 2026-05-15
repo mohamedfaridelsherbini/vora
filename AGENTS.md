@@ -4,6 +4,12 @@
 
 This file defines how coding agents operate in Vora. It is a delivery contract for architecture, ownership, and review discipline across Android, iOS, wearable, and automotive surfaces.
 
+## Architecture Diagrams
+
+Full UML reference — module graph, clean architecture layers, class diagram, DI graph, and expect/actual map — lives in **[UML.md](./UML.md)**.
+
+Diagrams use Mermaid syntax and render natively in GitHub, JetBrains IDEs, and VS Code (Markdown Preview Mermaid Support).
+
 ## Project Context
 
 | Item | Value |

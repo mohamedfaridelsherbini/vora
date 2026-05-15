@@ -2,19 +2,24 @@ package com.mohamedfaridelsherbini.vora.presentation.notes
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.HelpOutline
 import androidx.compose.material.icons.outlined.CheckCircle
+import androidx.compose.material.icons.outlined.DeleteOutline
 import androidx.compose.material.icons.outlined.DirectionsCar
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.KeyboardVoice
 import androidx.compose.material.icons.outlined.PhoneAndroid
 import androidx.compose.material.icons.outlined.PriorityHigh
@@ -40,6 +45,8 @@ import com.mohamedfaridelsherbini.vora.presentation.theme.interFontFamily
 internal fun NotesHeader(
     titleColor: Color,
     subtitleColor: Color,
+    summaryText: String,
+    statusLabel: String,
     statusBackground: Color,
     statusTextColor: Color,
 ) {
@@ -56,17 +63,17 @@ internal fun NotesHeader(
             horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             Text(
-                text = "12 memos · 18 min",
+                text = summaryText,
                 color = subtitleColor,
                 fontFamily = interFontFamily(),
                 fontWeight = FontWeight.Medium,
                 fontSize = 12.sp,
             )
             StatusChip(
-                label = "Synced",
+                label = statusLabel,
                 background = statusBackground,
                 textColor = statusTextColor,
-                icon = Icons.Outlined.CheckCircle,
+                icon = if (statusLabel == "Syncing") Icons.Outlined.Sync else Icons.Outlined.CheckCircle,
             )
         }
     }
@@ -105,13 +112,34 @@ internal fun NotesSearchBar(
 
 @Composable
 internal fun NotesFilterRow(
+    filters: List<NotesSourceFilterUi>,
     background: Color,
     textColor: Color,
+    onSelect: (String) -> Unit,
 ) {
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        FilterChip("All 12", true, background, textColor)
-        FilterChip("Pending 2", false, background, textColor, icon = Icons.Outlined.Sync)
-        FilterChip("Needs review", false, Color(0xFFF9ECE8), Color(0xFFC95B4A), icon = Icons.Outlined.PriorityHigh)
+        filters.forEach { filter ->
+            FilterChip(
+                label = "${filter.label} ${filter.count}",
+                selected = filter.selected,
+                background = background,
+                textColor = textColor,
+                icon = filter.icon(),
+                onClick = { onSelect(filter.key) },
+            )
+        }
+    }
+}
+
+@Composable
+internal fun NotesLoadingFilterRow(
+    background: Color,
+    selectedBackground: Color,
+) {
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        LoadingPill(width = 48.dp, background = selectedBackground)
+        LoadingPill(width = 70.dp, background = background)
+        LoadingPill(width = 82.dp, background = Color(0xFFF8ECE9))
     }
 }
 
@@ -127,6 +155,138 @@ internal fun NotesRecentLabel(textColor: Color) {
 }
 
 @Composable
+internal fun NotesEmptyStateCard(
+    modifier: Modifier = Modifier,
+    titleColor: Color,
+    subtitleColor: Color,
+    background: Color,
+    borderColor: Color,
+    iconColor: Color,
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(background, RoundedCornerShape(18.dp))
+            .border(1.dp, borderColor, RoundedCornerShape(18.dp))
+            .padding(horizontal = 22.dp, vertical = 26.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        Icon(
+            imageVector = Icons.AutoMirrored.Outlined.HelpOutline,
+            contentDescription = null,
+            tint = iconColor,
+            modifier = Modifier.size(20.dp),
+        )
+        Text(
+            text = "No voice memos yet",
+            color = titleColor,
+            fontFamily = interFontFamily(),
+            fontWeight = FontWeight.Bold,
+            fontSize = 16.sp,
+        )
+        Text(
+            text = "Tap record to capture your first thought.",
+            color = subtitleColor,
+            fontFamily = interFontFamily(),
+            fontWeight = FontWeight.Medium,
+            fontSize = 14.sp,
+        )
+    }
+}
+
+@Composable
+internal fun NotesLoadingStatusCard(
+    titleColor: Color,
+    subtitleColor: Color,
+    background: Color,
+    borderColor: Color,
+    iconTint: Color,
+    accentColor: Color,
+    skeletonColor: Color,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(background, RoundedCornerShape(18.dp))
+            .border(1.dp, borderColor, RoundedCornerShape(18.dp))
+            .padding(horizontal = 16.dp, vertical = 14.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(
+            modifier = Modifier
+                .size(22.dp)
+                .background(Color.Transparent, CircleShape)
+                .border(1.dp, borderColor, CircleShape),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.Sync,
+                contentDescription = null,
+                tint = iconTint,
+                modifier = Modifier.size(12.dp),
+            )
+        }
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(3.dp),
+        ) {
+            Text(
+                text = "Restoring recent memos",
+                color = titleColor,
+                fontFamily = interFontFamily(),
+                fontWeight = FontWeight.Bold,
+                fontSize = 14.sp,
+            )
+            Text(
+                text = "Checking local files before cloud sync.",
+                color = subtitleColor,
+                fontFamily = interFontFamily(),
+                fontWeight = FontWeight.Medium,
+                fontSize = 12.sp,
+            )
+            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                LoadingLine(width = 56.dp, height = 5.dp, color = accentColor)
+                LoadingLine(width = 108.dp, height = 5.dp, color = skeletonColor)
+            }
+        }
+    }
+}
+
+@Composable
+internal fun LoadingMemoCard(
+    background: Color,
+    borderColor: Color,
+    lineColor: Color,
+    chipColor: Color,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(background, RoundedCornerShape(18.dp))
+            .border(1.dp, borderColor, RoundedCornerShape(18.dp))
+            .padding(horizontal = 14.dp, vertical = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        Row(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
+            LoadingLine(
+                modifier = Modifier.weight(1f),
+                width = null,
+                height = 12.dp,
+                color = lineColor,
+            )
+            LoadingLine(width = 46.dp, height = 12.dp, color = chipColor)
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
+            LoadingLine(width = 96.dp, height = 8.dp, color = chipColor)
+            Spacer(modifier = Modifier.weight(1f))
+            LoadingLine(width = 42.dp, height = 10.dp, color = chipColor)
+        }
+    }
+}
+
+@Composable
 internal fun MemoCard(
     memo: NoteListItemUi,
     titleColor: Color,
@@ -135,6 +295,8 @@ internal fun MemoCard(
     cardBorder: Color,
     sourceBackground: Color,
     sourceTextColor: Color,
+    onRename: () -> Unit,
+    onDelete: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -169,7 +331,25 @@ internal fun MemoCard(
                 fontSize = 12.sp,
             )
         }
-        Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Row(horizontalArrangement = Arrangement.spacedBy(14.dp), verticalAlignment = Alignment.CenterVertically) {
+                MemoAction(
+                    label = "Rename",
+                    icon = Icons.Outlined.Edit,
+                    tint = metaColor,
+                    onClick = onRename,
+                )
+                MemoAction(
+                    label = "Delete",
+                    icon = Icons.Outlined.DeleteOutline,
+                    tint = VoraColors.Danger,
+                    onClick = onDelete,
+                )
+            }
             StatusChip(
                 label = memo.source,
                 background = sourceBackground,
@@ -185,11 +365,13 @@ internal fun RecordFab(
     modifier: Modifier = Modifier,
     background: Color,
     textColor: Color,
+    onClick: () -> Unit,
 ) {
     Box(
         modifier = modifier
             .size(64.dp)
-            .background(background, CircleShape),
+            .background(background, CircleShape)
+            .clickable(onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
         Icon(
@@ -197,6 +379,34 @@ internal fun RecordFab(
             contentDescription = "Record memo",
             tint = textColor,
             modifier = Modifier.size(22.dp),
+        )
+    }
+}
+
+@Composable
+private fun MemoAction(
+    label: String,
+    icon: ImageVector,
+    tint: Color,
+    onClick: () -> Unit,
+) {
+    Row(
+        modifier = Modifier.clickable(onClick = onClick),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = label,
+            tint = tint,
+            modifier = Modifier.size(14.dp),
+        )
+        Text(
+            text = label,
+            color = tint,
+            fontFamily = interFontFamily(),
+            fontWeight = FontWeight.Medium,
+            fontSize = 12.sp,
         )
     }
 }
@@ -240,6 +450,7 @@ private fun FilterChip(
     background: Color,
     textColor: Color,
     icon: ImageVector? = null,
+    onClick: (() -> Unit)? = null,
 ) {
     Row(
         modifier = Modifier
@@ -247,6 +458,7 @@ private fun FilterChip(
                 color = if (selected) VoraColors.LogoInk else background,
                 shape = RoundedCornerShape(999.dp),
             )
+            .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
             .padding(horizontal = VoraSpacing.ChipHorizontal, vertical = VoraSpacing.ChipVertical),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -270,6 +482,33 @@ private fun FilterChip(
     }
 }
 
+@Composable
+private fun LoadingPill(
+    width: androidx.compose.ui.unit.Dp,
+    background: Color,
+) {
+    Box(
+        modifier = Modifier
+            .size(width = width, height = 22.dp)
+            .background(background, RoundedCornerShape(999.dp)),
+    )
+}
+
+@Composable
+private fun LoadingLine(
+    width: androidx.compose.ui.unit.Dp?,
+    height: androidx.compose.ui.unit.Dp,
+    color: Color,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier
+            .then(if (width != null) Modifier.size(width = width, height = height) else Modifier.height(height))
+            .background(color, RoundedCornerShape(999.dp))
+            .then(if (width == null) Modifier.fillMaxWidth() else Modifier),
+    )
+}
+
 private fun String.icon(): ImageVector = when (this) {
     "Phone" -> Icons.Outlined.PhoneAndroid
     "Watch" -> Icons.Outlined.Watch
@@ -277,13 +516,105 @@ private fun String.icon(): ImageVector = when (this) {
     else -> Icons.Outlined.CheckCircle
 }
 
-@Preview(name = "Status Chip", showBackground = true, backgroundColor = 0xFFF9FAFB)
+private fun NotesSourceFilterUi.icon(): ImageVector = when (key) {
+    "phone" -> Icons.Outlined.PhoneAndroid
+    "smart" -> Icons.Outlined.Watch
+    "car" -> Icons.Outlined.DirectionsCar
+    else -> Icons.Outlined.CheckCircle
+}
+
+@Preview(name = "Status Synced", showBackground = true, backgroundColor = 0xFFF9FAFB)
 @Composable
-private fun StatusChipPreview() {
+private fun SyncedStatusChipPreview() {
     StatusChip(
         label = "Synced",
         background = Color(0xFF3A7D58),
         textColor = VoraColors.VoraWhite,
+        icon = Icons.Outlined.CheckCircle,
+    )
+}
+
+@Preview(name = "Status Pending", showBackground = true, backgroundColor = 0xFFF9FAFB)
+@Composable
+private fun PendingStatusChipPreview() {
+    FilterChip(
+        label = "Pending 2",
+        selected = false,
+        background = Color(0xFFEFF4F7),
+        textColor = VoraColors.LogoInk,
+        icon = Icons.Outlined.Sync,
+        onClick = {},
+    )
+}
+
+@Preview(name = "Status Needs Review", showBackground = true, backgroundColor = 0xFFF9FAFB)
+@Composable
+private fun NeedsReviewStatusChipPreview() {
+    FilterChip(
+        label = "Needs review",
+        selected = false,
+        background = Color(0xFFF9ECE8),
+        textColor = Color(0xFFC95B4A),
+        icon = Icons.Outlined.PriorityHigh,
+        onClick = {},
+    )
+}
+
+@Preview(name = "Status Source Phone", showBackground = true, backgroundColor = 0xFFF9FAFB)
+@Composable
+private fun SourcePhoneChipPreview() {
+    StatusChip(
+        label = "Phone",
+        background = Color(0xFFEFF4F7),
+        textColor = VoraColors.LogoInk,
+        icon = Icons.Outlined.PhoneAndroid,
+    )
+}
+
+@Preview(name = "Status Source Watch", showBackground = true, backgroundColor = 0xFFF9FAFB)
+@Composable
+private fun SourceWatchChipPreview() {
+    StatusChip(
+        label = "Watch",
+        background = Color(0xFFEFF4F7),
+        textColor = VoraColors.LogoInk,
+        icon = Icons.Outlined.Watch,
+    )
+}
+
+@Preview(name = "Status Source Car", showBackground = true, backgroundColor = 0xFFF9FAFB)
+@Composable
+private fun SourceCarChipPreview() {
+    StatusChip(
+        label = "Car",
+        background = Color(0xFFEFF4F7),
+        textColor = VoraColors.LogoInk,
+        icon = Icons.Outlined.DirectionsCar,
+    )
+}
+
+@Preview(name = "Loading Status Card", showBackground = true, backgroundColor = 0xFFF9FAFB)
+@Composable
+private fun LoadingStatusCardPreview() {
+    NotesLoadingStatusCard(
+        titleColor = VoraColors.LogoInk,
+        subtitleColor = VoraColors.VoraMuted,
+        background = VoraColors.VoraWhite,
+        borderColor = Color(0xFFEDF2F5),
+        iconTint = VoraColors.VoraMuted,
+        accentColor = VoraColors.Tertiary,
+        skeletonColor = Color(0xFFE3EDF2),
+    )
+}
+
+@Preview(name = "Loading Memo Card", showBackground = true, backgroundColor = 0xFFF9FAFB)
+@Composable
+private fun LoadingMemoCardPreview() {
+    LoadingMemoCard(
+        background = VoraColors.VoraWhite,
+        borderColor = Color(0xFFEDF2F5),
+        lineColor = Color(0xFFD9EAF2),
+        chipColor = Color(0xFFE9EDF3),
     )
 }
 
@@ -293,5 +624,18 @@ private fun RecordFabPreview() {
     RecordFab(
         background = Color(0xFFEF2B2A),
         textColor = VoraColors.VoraWhite,
+        onClick = {},
+    )
+}
+
+@Preview(name = "Empty State Card", showBackground = true, backgroundColor = 0xFFF9FAFB)
+@Composable
+private fun EmptyStateCardPreview() {
+    NotesEmptyStateCard(
+        titleColor = VoraColors.LogoInk,
+        subtitleColor = VoraColors.VoraMuted,
+        background = Color(0xFFF7F9FB),
+        borderColor = Color(0xFFF0F3F6),
+        iconColor = VoraColors.LogoInk.copy(alpha = 0.78f),
     )
 }

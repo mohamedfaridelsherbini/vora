@@ -2,10 +2,13 @@ package com.mohamedfaridelsherbini.vora.di
 
 import com.mohamedfaridelsherbini.vora.audio.player.BootstrapAudioPlayerRepository
 import com.mohamedfaridelsherbini.vora.audio.recorder.BootstrapAudioRecorderRepository
-import com.mohamedfaridelsherbini.vora.data.repository.InMemoryVoiceMemoRepository
+import com.mohamedfaridelsherbini.vora.data.repository.RoomVoiceMemoRepository
 import com.mohamedfaridelsherbini.vora.domain.repository.AudioPlayerRepository
 import com.mohamedfaridelsherbini.vora.domain.repository.AudioRecorderRepository
 import com.mohamedfaridelsherbini.vora.domain.repository.VoiceMemoRepository
+import com.mohamedfaridelsherbini.vora.mock.VoiceMemoMockFactory
+import com.mohamedfaridelsherbini.vora.notes.NotesFeatureService
+import com.mohamedfaridelsherbini.vora.notes.NotesSnapshotFactory
 import org.koin.dsl.module
 
 private class DefaultSharedFoundationDependencies(
@@ -15,7 +18,9 @@ private class DefaultSharedFoundationDependencies(
 ) : SharedFoundationDependencies
 
 val sharedFoundationModule = module {
-    single<VoiceMemoRepository> { InMemoryVoiceMemoRepository() }
+    single { VoiceMemoMockFactory() }
+    single { NotesSnapshotFactory() }
+    single<VoiceMemoRepository> { RoomVoiceMemoRepository(get(), get()) }
     single<AudioRecorderRepository> { BootstrapAudioRecorderRepository() }
     single<AudioPlayerRepository> { BootstrapAudioPlayerRepository() }
     single<SharedFoundationDependencies> {
@@ -27,4 +32,5 @@ val sharedFoundationModule = module {
     }
     single { SharedFoundationGraph(get()) }
     single { get<SharedFoundationGraph>().voiceMemo }
+    single { NotesFeatureService(get(), get(), get()) }
 }
