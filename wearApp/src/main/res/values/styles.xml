@@ -1,8 +1,13 @@
 <resources>
 
+    <style name="Theme.Vora.Wear" parent="@android:style/Theme.DeviceDefault">
+        <item name="android:statusBarColor">@color/vora_charcoal</item>
+        <item name="android:navigationBarColor">@color/vora_charcoal</item>
+    </style>
+
     <style name="WearEntryActivityTheme.Starting" parent="Theme.SplashScreen">
-        <item name="windowSplashScreenBackground">@android:color/black</item>
-        <item name="windowSplashScreenAnimatedIcon">@drawable/vora_auto_splash_mark</item>
-        <item name="postSplashScreenTheme">@android:style/Theme.DeviceDefault</item>
+        <item name="windowSplashScreenBackground">@color/vora_charcoal</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/vora_auto_splash_mark_padded</item>
+        <item name="postSplashScreenTheme">@style/Theme.Vora.Wear</item>
     </style>
 </resources>
