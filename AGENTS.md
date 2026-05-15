@@ -175,6 +175,7 @@ Deliver production Android behavior for handheld capture, playback, storage, and
 - Android recording and playback integration
 - Android lifecycle safety
 - Android DI wiring and composition root discipline
+- Enforce SOLID structure inside Compose UI trees and screen state holders
 
 **Ownership boundaries**
 
@@ -193,6 +194,10 @@ Deliver production Android behavior for handheld capture, playback, storage, and
 - Is lifecycle handling explicit?
 - Are main-thread blocking calls avoided?
 - Are repositories, use cases, and services injected instead of manually created in UI or activities?
+- Is the route/container/content split clear where the screen is non-trivial?
+- Does each composable have one rendering responsibility?
+- Are child composable parameters narrow and role-specific instead of whole-screen objects by default?
+- Can design-system or leaf components be previewed without constructing app dependencies?
 
 **Anti-patterns**
 
@@ -200,6 +205,9 @@ Deliver production Android behavior for handheld capture, playback, storage, and
 - repository calls from UI
 - giant ViewModels
 - direct feature-to-feature UI coupling
+- route composables that also perform rendering, data access, and navigation decisions inline
+- leaf composables that accept a ViewModel or repository just for convenience
+- shared UI components that embed feature business rules
 
 ## IOSPlatformAgent
 

@@ -38,6 +38,8 @@ Vora is a Kotlin Multiplatform project with shared business logic and native pla
 - local storage implementations
 - permission handling and lifecycle coordination
 - Android composition root and DI modules
+- route/container/content separation for non-trivial Compose screens
+- immutable screen state and event-driven UI updates
 
 ### iOS
 
@@ -139,6 +141,19 @@ Recommended flow:
 ```text
 Activity/App Entry -> DI Composition Root -> State Holder -> Use Case -> Repository Contract -> Platform Adapter
 ```
+
+Compose screen shape:
+
+```text
+Route -> Screen Container -> Stateless Sections / Components
+```
+
+Rules:
+
+- `Route` owns dependency lookup and lifecycle entry wiring only.
+- `Screen Container` maps immutable UI state to rendering and emits events upward.
+- Stateless components render data and callbacks only.
+- Reusable design-system components must not depend on feature state holders or repositories.
 
 ## Data Flow
 

@@ -110,6 +110,17 @@ Do not:
 - Keep side effects in effect handlers or ViewModels, not render code.
 - Build reusable components for memo cards, controls, and empty states.
 - Keep navigation orchestration outside leaf composables.
+- Split screen concerns into distinct roles:
+  - route/composition entry
+  - screen container
+  - state holder
+  - pure UI components
+- Keep each composable focused on one rendering responsibility.
+- Pass only the data and callbacks a child needs.
+- Prefer feature-specific UI contracts over broad generic prop bags.
+- Extract behavior behind small interfaces when UI depends on platform services or coordinators.
+- Keep previewable composables free of repository, recorder, player, or navigator construction.
+- Model screen state as a single immutable snapshot plus explicit events.
 
 Do not:
 
@@ -117,6 +128,32 @@ Do not:
 - keep business logic in composables
 - build massive screens instead of smaller components
 - spread mutable state across sibling composables
+- pass entire state holders or ViewModels deep through the tree
+- create "god composables" that own layout, business rules, navigation, and side effects
+- use parameter lists that mix unrelated concerns just to avoid extracting components
+- hide imperative work in `remember {}` blocks that should live in a state holder
+
+## SOLID for Compose UI
+
+- Single Responsibility:
+  - one composable should render one coherent piece of UI
+  - one state holder should own one screen or one tightly scoped interaction flow
+- Open/Closed:
+  - extend screens through slots, small wrapper components, or new UI models before editing stable shared components
+- Liskov Substitution:
+  - composables with the same role should preserve expected behavior when swapped, especially for design-system components
+- Interface Segregation:
+  - child composables receive narrow props such as `title`, `isPlaying`, `onPlayClick`
+  - avoid passing full screen state where a smaller view model object is enough
+- Dependency Inversion:
+  - composables depend on UI state and callbacks, not concrete repositories, audio engines, nav controllers, or Android services
+
+Reject:
+
+- `ScreenContent(viewModel = ...)` as the default leaf-component API
+- components that mutate external state directly instead of raising events
+- reusable components that encode feature-specific business policy
+- one ViewModel or state holder managing multiple unrelated screens
 
 ## SwiftUI Rules
 
