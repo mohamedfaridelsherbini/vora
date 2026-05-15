@@ -26,6 +26,51 @@ Do not:
 - expand a short answer into a framework or taxonomy the user did not ask for
 - include low-signal recap when the result is already clear
 
+## SOLID Rules
+
+- Every type must have one clear responsibility.
+- Prefer composition over inheritance unless inheritance is required by a platform API.
+- Keep interfaces narrow and capability-focused.
+- High-level policy must depend on abstractions, not concrete implementations.
+- Concrete implementations must remain safely substitutable for their interfaces.
+
+Do not:
+
+- create god classes, god repositories, or god ViewModels
+- merge unrelated concerns into one screen state holder or service
+- expose broad interfaces that force callers to depend on methods they do not use
+- make domain or presentation layers depend directly on framework implementations
+
+## Clean Architecture Rules
+
+- Presentation depends on use cases and UI models only.
+- Use cases depend on repository contracts and policy abstractions only.
+- Data and platform layers implement contracts but do not own business policy.
+- Keep domain models, persistence models, DTOs, and UI state separate.
+- Every cross-layer boundary must be explicit.
+
+Do not:
+
+- place business rules in activities, composables, or SwiftUI views
+- let repositories return framework types to domain or presentation layers
+- let persistence schema shape domain APIs
+- bypass use cases for state-changing behavior
+
+## Dependency Injection Rules
+
+- Use dependency injection across all modules.
+- Constructor injection is the default for use cases, repositories, coordinators, state holders, and adapters.
+- Every platform module must have a composition root in its `di/` area.
+- Inject dispatchers, clocks, ID generators, and platform wrappers when they affect behavior or testing.
+- Keep DI setup explicit and easy to trace.
+
+Do not:
+
+- instantiate repositories, recorders, players, or sync coordinators inside screens or views
+- hide dependencies behind global mutable singletons
+- use service locator patterns except at unavoidable platform boundaries
+- couple DI wiring to unrelated UI rendering code
+
 ## Kotlin Rules
 
 - Use `val` by default.

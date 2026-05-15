@@ -40,6 +40,33 @@ This file defines how coding agents operate in Vora. It is a delivery contract f
 - Preserve one-way dependency direction.
 - Reject placeholder production logic.
 - Escalate contract or dependency changes for explicit review.
+- Apply SOLID principles in every module and file, not only in domain code.
+- Preserve Clean Architecture boundaries on every feature and platform surface.
+- Use dependency injection for repositories, use cases, platform services, dispatchers, and state holders instead of constructing dependencies inline.
+
+## Engineering Mandates
+
+### SOLID
+
+- Single Responsibility: each class, file, and composable or view should have one clear reason to change.
+- Open/Closed: extend behavior through new types, adapters, or strategies before editing stable shared contracts.
+- Liskov Substitution: interface implementations must preserve contract semantics across Android, iOS, wear, and car.
+- Interface Segregation: prefer small focused contracts over broad repository or manager interfaces.
+- Dependency Inversion: high-level policy depends on abstractions; low-level platform code implements them.
+
+### Clean Architecture
+
+- Presentation depends on use cases, not concrete data sources.
+- Use cases depend on repository contracts, not framework code.
+- Data and platform layers implement shared abstractions and remain replaceable.
+- UI state, domain models, persistence models, and transport models remain separate types.
+
+### Dependency Injection
+
+- No direct construction of repositories, recorders, players, sync coordinators, or platform services inside screens or views.
+- Every module should expose a clear composition root or DI entry point in its `di/` area.
+- Constructor injection is the default. Service locator style access is forbidden except where a platform framework forces it at the boundary.
+- Dispatchers, clocks, ID generators, and other environment dependencies must be injectable.
 
 ## Ownership Matrix
 
@@ -65,6 +92,7 @@ Preserve a feature-first, clean architecture that scales without coupling platfo
 - Guard dependency direction and package structure.
 - Review new abstractions, contracts, and third-party libraries.
 - Prevent cross-feature shortcuts.
+- Enforce SOLID, Clean Architecture, and DI discipline across the repo.
 
 **Ownership boundaries**
 
@@ -84,6 +112,7 @@ Preserve a feature-first, clean architecture that scales without coupling platfo
 - Did a new abstraction solve a real duplication or complexity problem?
 - Are feature boundaries obvious from names and packages?
 - Would this change force unrelated modules to know too much?
+- Are dependencies injected at the composition root rather than created inline?
 
 **Anti-patterns**
 
@@ -103,6 +132,7 @@ Keep core business logic portable, deterministic, and platform-neutral.
 - Own domain models, repository contracts, and use cases.
 - Define sync contracts and shared business rules.
 - Keep models immutable and semantics explicit.
+- Keep interfaces small, substitutable, and dependency-inverted.
 
 **Ownership boundaries**
 
@@ -123,6 +153,7 @@ Keep core business logic portable, deterministic, and platform-neutral.
 - Is behavior testable without Android or iOS runtime?
 - Is the contract domain-oriented rather than storage-oriented?
 - Are models immutable by default?
+- Does the use case depend only on abstractions and injected collaborators?
 
 **Anti-patterns**
 
@@ -143,6 +174,7 @@ Deliver production Android behavior for handheld capture, playback, storage, and
 - Android implementations of shared contracts
 - Android recording and playback integration
 - Android lifecycle safety
+- Android DI wiring and composition root discipline
 
 **Ownership boundaries**
 
@@ -160,6 +192,7 @@ Deliver production Android behavior for handheld capture, playback, storage, and
 - Are side effects moved out of composables?
 - Is lifecycle handling explicit?
 - Are main-thread blocking calls avoided?
+- Are repositories, use cases, and services injected instead of manually created in UI or activities?
 
 **Anti-patterns**
 
@@ -180,6 +213,7 @@ Deliver Apple-native experiences while reusing shared business logic instead of 
 - AVFoundation integration on iPhone
 - watchOS-native UI on Apple platforms
 - persistence and connectivity orchestration on Apple platforms
+- Apple-side composition root and DI wiring
 
 **Ownership boundaries**
 
@@ -197,6 +231,7 @@ Deliver Apple-native experiences while reusing shared business logic instead of 
 - Is navigation native to Apple platforms?
 - Is AVAudioSession ownership explicit?
 - Does Swift code consume shared contracts rather than replacing them?
+- Are services and coordinators injected into state owners instead of created inside views?
 
 **Anti-patterns**
 

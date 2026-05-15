@@ -1,19 +1,19 @@
-//
-//  ContentView.swift
-//  VoraWatch Watch App
-//
-//  Created by Mohamed Elsherbini on 12.05.26.
-//
-
 import SwiftUI
 
 struct WatchRecordView: View {
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        VStack(spacing: 10) {
+            Text("Vora")
+                .font(.system(size: 22, weight: .bold, design: .rounded))
+
+            Text("Watch shell ready for fast capture.")
+                .font(.system(size: 12, weight: .medium, design: .rounded))
+                .multilineTextAlignment(.center)
+                .foregroundStyle(.secondary)
+
+            Text("One tap • large targets • low battery")
+                .font(.system(size: 11, weight: .semibold, design: .rounded))
+                .multilineTextAlignment(.center)
         }
         .padding()
     }

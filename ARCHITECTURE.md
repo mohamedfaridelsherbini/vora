@@ -4,6 +4,12 @@
 
 Vora is a Kotlin Multiplatform project with shared business logic and native platform presentation layers. The architecture favors fast local capture, offline-first persistence, and native interaction patterns on each surface.
 
+## Architectural Principles
+
+- SOLID applies to every layer, including UI, state holders, use cases, repositories, and platform adapters.
+- Clean Architecture is mandatory: policy points inward, implementations point outward.
+- Dependency Injection is required across the repo so features remain testable, replaceable, and platform-safe.
+
 ## Module Structure
 
 | Module | Responsibility |
@@ -23,6 +29,7 @@ Vora is a Kotlin Multiplatform project with shared business logic and native pla
 - `domain/usecase`: business actions
 - `data/*`: shared data shaping contracts and mappers that remain platform-neutral
 - `audio/*`: shared audio state models and capability contracts only
+- `di/`: shared wiring helpers or contract-level DI utilities only, never platform framework containers
 
 ### Android
 
@@ -30,6 +37,7 @@ Vora is a Kotlin Multiplatform project with shared business logic and native pla
 - Android audio recording and playback adapters
 - local storage implementations
 - permission handling and lifecycle coordination
+- Android composition root and DI modules
 
 ### iOS
 
@@ -37,6 +45,7 @@ Vora is a Kotlin Multiplatform project with shared business logic and native pla
 - AVFoundation adapters
 - Apple persistence and connectivity adapters
 - watchOS-specific Apple-side coordination
+- Apple composition root and DI entry points
 
 ### Wear OS
 
@@ -54,6 +63,12 @@ Vora is a Kotlin Multiplatform project with shared business logic and native pla
 
 ```text
 UI -> State Holder -> Use Case -> Repository Contract -> Platform Implementation
+```
+
+Dependency creation rule:
+
+```text
+Composition Root -> injects State Holder / Use Case / Repository / Platform Service
 ```
 
 Detailed direction:
@@ -112,6 +127,19 @@ Use equivalent feature-oriented grouping:
 - `theme`
 - `di`
 
+## Dependency Injection Topology
+
+- `shared` defines abstractions and use-case constructors.
+- `composeApp`, `wearApp`, `carApp`, and `iosApp` own their composition roots.
+- Platform DI layers assemble concrete repositories, audio services, persistence adapters, and state holders.
+- UI code receives injected dependencies; it does not create them.
+
+Recommended flow:
+
+```text
+Activity/App Entry -> DI Composition Root -> State Holder -> Use Case -> Repository Contract -> Platform Adapter
+```
+
 ## Data Flow
 
 1. UI emits an intent.
@@ -142,12 +170,15 @@ Use equivalent feature-oriented grouping:
 ## Architectural Constraints
 
 - Clean architecture boundaries are mandatory.
+- SOLID compliance is mandatory.
+- Dependency injection is mandatory for all non-trivial dependencies.
 - Shared models are immutable.
 - UI layers do not own business policy.
 - Repository interfaces live in `shared`.
 - Platform modules own framework-specific code.
 - No cyclic dependencies.
 - No direct feature coupling without a stable contract.
+- No inline construction of repositories, recorders, players, data sources, or sync coordinators inside UI layers.
 
 ## Early Scope Decisions
 

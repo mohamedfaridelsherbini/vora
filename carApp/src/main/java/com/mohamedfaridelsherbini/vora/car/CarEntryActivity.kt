@@ -32,7 +32,7 @@ class CarEntryActivity : ComponentActivity() {
                             style = MaterialTheme.typography.headlineMedium,
                         )
                         Text(
-                            text = "Playback-first automotive surface.",
+                            text = "Playback-first automotive shell with shared contracts and DI composition.",
                             style = MaterialTheme.typography.bodyMedium,
                         )
                     }
