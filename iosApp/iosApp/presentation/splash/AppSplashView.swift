@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct SplashView: View {
+struct AppSplashView: View {
     @Environment(\.colorScheme) private var colorScheme
     @State private var pulseOpacity: Double = 0.35
 
@@ -67,8 +67,8 @@ struct SplashView: View {
                     .padding(.top, 14)
                     .padding(.bottom, 8)
             }
-            .padding(.horizontal, 32)
-            .padding(.vertical, 28)
+            .padding(.horizontal, VoraSpacing.splashHorizontal)
+            .padding(.vertical, VoraSpacing.splashVertical)
         }
         .task {
             withAnimation(.easeInOut(duration: 1.2).repeatForever(autoreverses: true)) {

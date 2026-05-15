@@ -1,4 +1,4 @@
-package com.mohamedfaridelsherbini.vora.wear.presentation
+package com.mohamedfaridelsherbini.vora.wear.presentation.capture
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
@@ -14,7 +14,7 @@ import kotlinx.coroutines.delay
 private const val WearSplashHandoffDurationMs = 420L
 
 @Composable
-internal fun WearRoute() {
+internal fun CaptureRoute() {
     var uiState by remember { mutableStateOf(WearUiState(showSplash = true)) }
 
     LaunchedEffect(Unit) {
@@ -29,9 +29,9 @@ internal fun WearRoute() {
             label = "wear-app-shell",
         ) { splashVisible ->
             if (splashVisible) {
-                WearSplashContent(state = WearSplashVisualState())
+                WearSplashScreen(state = WearSplashVisualState())
             } else {
-                WearHomeContent(state = WearHomeVisualState())
+                WearCaptureScreen(state = WearHomeVisualState())
             }
         }
     }

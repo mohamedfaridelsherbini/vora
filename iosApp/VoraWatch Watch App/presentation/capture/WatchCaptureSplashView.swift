@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct WatchSplashView: View {
+struct WatchCaptureSplashView: View {
     @State private var dotOpacity = 0.45
 
     var body: some View {
@@ -31,8 +31,4 @@ struct WatchSplashView: View {
             }
         }
     }
-}
-
-#Preview {
-    WatchSplashView()
 }

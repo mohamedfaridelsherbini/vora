@@ -1,4 +1,4 @@
-package com.mohamedfaridelsherbini.vora.wear.presentation
+package com.mohamedfaridelsherbini.vora.wear.presentation.capture
 
 import androidx.compose.ui.graphics.Color
 

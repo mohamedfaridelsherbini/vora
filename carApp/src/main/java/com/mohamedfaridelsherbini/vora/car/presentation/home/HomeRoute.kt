@@ -1,4 +1,4 @@
-package com.mohamedfaridelsherbini.vora.car
+package com.mohamedfaridelsherbini.vora.car.presentation.home
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
@@ -15,7 +15,7 @@ import kotlinx.coroutines.delay
 private const val SplashHandoffDurationMs = 480L
 
 @Composable
-internal fun CarRoute() {
+internal fun HomeRoute() {
     var uiState by remember { mutableStateOf(CarUiState(showSplash = true)) }
 
     LaunchedEffect(Unit) {
@@ -31,9 +31,9 @@ internal fun CarRoute() {
                 label = "car-app-shell",
             ) { splashVisible ->
                 if (splashVisible) {
-                    CarSplashContent(state = CarSplashVisualState())
+                    CarSplashScreen(state = CarSplashVisualState())
                 } else {
-                    CarHomeContent(state = CarHomeVisualState())
+                    CarHomeScreen(state = CarHomeVisualState())
                 }
             }
         }

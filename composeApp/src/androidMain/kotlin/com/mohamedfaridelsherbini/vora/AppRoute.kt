@@ -26,15 +26,11 @@ internal fun AppRoute() {
     MaterialTheme {
         Surface {
             Crossfade(
-                targetState = uiState.showSplash,
+                targetState = uiState,
                 animationSpec = tween(durationMillis = 220),
                 label = "app-shell",
-            ) { splashVisible ->
-                if (splashVisible) {
-                    VoraSplashContent(state = splashVisualState())
-                } else {
-                    VoraHomeContent(state = homeVisualState())
-                }
+            ) { currentState ->
+                AppContent(uiState = currentState)
             }
         }
     }

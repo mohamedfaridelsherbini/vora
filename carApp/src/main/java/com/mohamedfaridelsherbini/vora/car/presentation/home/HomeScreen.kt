@@ -1,4 +1,4 @@
-package com.mohamedfaridelsherbini.vora.car
+package com.mohamedfaridelsherbini.vora.car.presentation.home
 
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -30,9 +30,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mohamedfaridelsherbini.vora.car.R
 
 @Composable
-internal fun CarSplashContent(state: CarSplashVisualState) {
+internal fun CarSplashScreen(state: CarSplashVisualState) {
     val pulse = rememberInfiniteTransition(label = "car-voice-pulse")
     val pulseAlpha by pulse.animateFloat(
         initialValue = 0.45f,
@@ -83,7 +84,7 @@ internal fun CarSplashContent(state: CarSplashVisualState) {
 }
 
 @Composable
-internal fun CarHomeContent(state: CarHomeVisualState) {
+internal fun CarHomeScreen(state: CarHomeVisualState) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -128,41 +129,6 @@ private fun CarPulseDots(
 }
 
 @Preview(
-    name = "Car Divider",
-    widthDp = 240,
-    heightDp = 80,
-    showBackground = true,
-    backgroundColor = 0xFF111827,
-)
-@Composable
-private fun CarSplashDividerPreview() {
-    MaterialTheme {
-        Surface {
-            CarSplashDivider(color = Color(0xFF24314F))
-        }
-    }
-}
-
-@Preview(
-    name = "Car Pulse Dots",
-    widthDp = 240,
-    heightDp = 80,
-    showBackground = true,
-    backgroundColor = 0xFF111827,
-)
-@Composable
-private fun CarPulseDotsPreview() {
-    MaterialTheme {
-        Surface {
-            CarPulseDots(
-                color = Color(0xFF2563EB),
-                alphaValues = listOf(1f, 0.78f, 0.56f),
-            )
-        }
-    }
-}
-
-@Preview(
     name = "Car Splash",
     widthDp = 1280,
     heightDp = 720,
@@ -173,7 +139,7 @@ private fun CarPulseDotsPreview() {
 private fun CarSplashScreenPreview() {
     MaterialTheme {
         Surface {
-            CarSplashContent(state = CarSplashVisualState())
+            CarSplashScreen(state = CarSplashVisualState())
         }
     }
 }
@@ -186,10 +152,10 @@ private fun CarSplashScreenPreview() {
     backgroundColor = 0xFF111827,
 )
 @Composable
-private fun CarHomePlaceholderPreview() {
+private fun CarHomeScreenPreview() {
     MaterialTheme {
         Surface {
-            CarHomeContent(state = CarHomeVisualState())
+            CarHomeScreen(state = CarHomeVisualState())
         }
     }
 }

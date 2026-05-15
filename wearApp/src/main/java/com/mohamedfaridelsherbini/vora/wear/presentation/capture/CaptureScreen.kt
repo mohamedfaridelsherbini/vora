@@ -1,4 +1,4 @@
-package com.mohamedfaridelsherbini.vora.wear.presentation
+package com.mohamedfaridelsherbini.vora.wear.presentation.capture
 
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -33,7 +33,7 @@ import com.mohamedfaridelsherbini.vora.wear.R
 import com.mohamedfaridelsherbini.vora.wear.presentation.theme.VoraTheme
 
 @Composable
-internal fun WearSplashContent(state: WearSplashVisualState) {
+internal fun WearSplashScreen(state: WearSplashVisualState) {
     val pulse = rememberInfiniteTransition(label = "wear-pulse")
     val dotAlpha by pulse.animateFloat(
         initialValue = 0.45f,
@@ -70,7 +70,7 @@ internal fun WearSplashContent(state: WearSplashVisualState) {
 }
 
 @Composable
-internal fun WearHomeContent(state: WearHomeVisualState) {
+internal fun WearCaptureScreen(state: WearHomeVisualState) {
     ScreenScaffold(
         timeText = { TimeText() },
     ) {
@@ -111,33 +111,16 @@ private fun WearPulseDot(
 @WearPreviewDevices
 @WearPreviewFontScales
 @Composable
-fun DefaultPreview() {
-    WearApp()
+fun WearCapturePreview() {
+    VoraTheme {
+        WearCaptureScreen(state = WearHomeVisualState())
+    }
 }
 
 @Preview
 @Composable
 private fun WearSplashScreenPreview() {
     VoraTheme {
-        WearSplashContent(state = WearSplashVisualState())
-    }
-}
-
-@Preview
-@Composable
-private fun WearHomeContentPreview() {
-    VoraTheme {
-        WearHomeContent(state = WearHomeVisualState())
-    }
-}
-
-@Preview
-@Composable
-private fun WearPulseDotPreview() {
-    VoraTheme {
-        WearPulseDot(
-            alpha = 1f,
-            color = Color(0xFF2563EB),
-        )
+        WearSplashScreen(state = WearSplashVisualState())
     }
 }
