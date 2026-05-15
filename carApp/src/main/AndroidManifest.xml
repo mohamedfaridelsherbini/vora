@@ -15,7 +15,8 @@
         android:theme="@style/Theme.Vora">
         <activity
             android:name=".CarEntryActivity"
-            android:exported="true">
+            android:exported="true"
+            android:theme="@style/Theme.Vora.Starting">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
