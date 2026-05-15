@@ -6,16 +6,28 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.CheckCircle
+import androidx.compose.material.icons.outlined.DirectionsCar
+import androidx.compose.material.icons.outlined.KeyboardVoice
+import androidx.compose.material.icons.outlined.PhoneAndroid
+import androidx.compose.material.icons.outlined.PriorityHigh
+import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.outlined.Sync
+import androidx.compose.material.icons.outlined.Watch
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -50,7 +62,12 @@ internal fun NotesHeader(
                 fontWeight = FontWeight.Medium,
                 fontSize = 12.sp,
             )
-            StatusChip("Synced", statusBackground, statusTextColor)
+            StatusChip(
+                label = "Synced",
+                background = statusBackground,
+                textColor = statusTextColor,
+                icon = Icons.Outlined.CheckCircle,
+            )
         }
     }
 }
@@ -70,12 +87,11 @@ internal fun NotesSearchBar(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-        Text(
-            text = "Q",
-            color = textColor.copy(alpha = 0.65f),
-            fontFamily = interFontFamily(),
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 12.sp,
+        Icon(
+            imageVector = Icons.Outlined.Search,
+            contentDescription = null,
+            tint = textColor.copy(alpha = 0.65f),
+            modifier = Modifier.size(16.dp),
         )
         Text(
             text = "Search transcripts",
@@ -94,8 +110,8 @@ internal fun NotesFilterRow(
 ) {
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         FilterChip("All 12", true, background, textColor)
-        FilterChip("Pending 2", false, background, textColor)
-        FilterChip("Needs review", false, Color(0xFFF9ECE8), Color(0xFFC95B4A))
+        FilterChip("Pending 2", false, background, textColor, icon = Icons.Outlined.Sync)
+        FilterChip("Needs review", false, Color(0xFFF9ECE8), Color(0xFFC95B4A), icon = Icons.Outlined.PriorityHigh)
     }
 }
 
@@ -154,7 +170,12 @@ internal fun MemoCard(
             )
         }
         Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
-            StatusChip(memo.source, sourceBackground, sourceTextColor)
+            StatusChip(
+                label = memo.source,
+                background = sourceBackground,
+                textColor = sourceTextColor,
+                icon = memo.source.icon(),
+            )
         }
     }
 }
@@ -171,12 +192,11 @@ internal fun RecordFab(
             .background(background, CircleShape),
         contentAlignment = Alignment.Center,
     ) {
-        Text(
-            text = "Rec",
-            color = textColor,
-            fontFamily = interFontFamily(),
-            fontWeight = FontWeight.Bold,
-            fontSize = 13.sp,
+        Icon(
+            imageVector = Icons.Outlined.KeyboardVoice,
+            contentDescription = "Record memo",
+            tint = textColor,
+            modifier = Modifier.size(22.dp),
         )
     }
 }
@@ -186,17 +206,31 @@ private fun StatusChip(
     label: String,
     background: Color,
     textColor: Color,
+    icon: ImageVector? = null,
 ) {
-    Text(
-        text = label,
-        color = textColor,
-        fontFamily = interFontFamily(),
-        fontWeight = FontWeight.SemiBold,
-        fontSize = 12.sp,
+    Row(
         modifier = Modifier
             .background(background, RoundedCornerShape(999.dp))
             .padding(horizontal = VoraSpacing.ChipHorizontal, vertical = VoraSpacing.ChipVertical),
-    )
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        if (icon != null) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = textColor,
+                modifier = Modifier.size(12.dp),
+            )
+        }
+        Text(
+            text = label,
+            color = textColor,
+            fontFamily = interFontFamily(),
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 12.sp,
+        )
+    }
 }
 
 @Composable
@@ -205,20 +239,42 @@ private fun FilterChip(
     selected: Boolean,
     background: Color,
     textColor: Color,
+    icon: ImageVector? = null,
 ) {
-    Text(
-        text = label,
-        color = if (selected) VoraColors.LogoPaper else textColor,
-        fontFamily = interFontFamily(),
-        fontWeight = FontWeight.SemiBold,
-        fontSize = 12.sp,
+    Row(
         modifier = Modifier
             .background(
                 color = if (selected) VoraColors.LogoInk else background,
                 shape = RoundedCornerShape(999.dp),
             )
             .padding(horizontal = VoraSpacing.ChipHorizontal, vertical = VoraSpacing.ChipVertical),
-    )
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        val foreground = if (selected) VoraColors.LogoPaper else textColor
+        if (icon != null) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = foreground,
+                modifier = Modifier.size(12.dp),
+            )
+            Spacer(modifier = Modifier.size(6.dp))
+        }
+        Text(
+            text = label,
+            color = foreground,
+            fontFamily = interFontFamily(),
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 12.sp,
+        )
+    }
+}
+
+private fun String.icon(): ImageVector = when (this) {
+    "Phone" -> Icons.Outlined.PhoneAndroid
+    "Watch" -> Icons.Outlined.Watch
+    "Car" -> Icons.Outlined.DirectionsCar
+    else -> Icons.Outlined.CheckCircle
 }
 
 @Preview(name = "Status Chip", showBackground = true, backgroundColor = 0xFFF9FAFB)

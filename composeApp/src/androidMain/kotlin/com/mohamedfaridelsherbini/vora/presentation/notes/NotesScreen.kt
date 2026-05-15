@@ -3,7 +3,7 @@ package com.mohamedfaridelsherbini.vora.presentation.notes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -22,53 +22,12 @@ internal fun NotesScreen(state: NotesListVisualState) {
         modifier = Modifier
             .fillMaxSize()
             .background(state.background)
-            .padding(horizontal = VoraSpacing.PageHorizontal, vertical = VoraSpacing.PageTop),
+            .padding(horizontal = VoraSpacing.PageHorizontal),
     ) {
-        LazyColumn(
+        NotesListContent(
             modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(14.dp),
-        ) {
-            item {
-                NotesHeader(
-                    titleColor = state.titleColor,
-                    subtitleColor = state.subtitleColor,
-                    statusBackground = state.statusChipBackground,
-                    statusTextColor = state.statusChipTextColor,
-                )
-            }
-            item {
-                NotesSearchBar(
-                    background = state.searchBackground,
-                    borderColor = state.searchBorder,
-                    textColor = state.metaColor,
-                )
-            }
-            item {
-                NotesFilterRow(
-                    background = state.filterChipBackground,
-                    textColor = state.filterChipTextColor,
-                )
-            }
-            item {
-                NotesRecentLabel(
-                    textColor = state.metaColor,
-                )
-            }
-            items(state.memos) { memo ->
-                MemoCard(
-                    memo = memo,
-                    titleColor = state.titleColor,
-                    metaColor = state.metaColor,
-                    cardBackground = state.cardBackground,
-                    cardBorder = state.cardBorder,
-                    sourceBackground = state.filterChipBackground,
-                    sourceTextColor = state.filterChipTextColor,
-                )
-            }
-            item {
-                Spacer(modifier = Modifier.padding(bottom = 88.dp))
-            }
-        }
+            state = state,
+        )
 
         RecordFab(
             modifier = Modifier
@@ -78,6 +37,67 @@ internal fun NotesScreen(state: NotesListVisualState) {
             textColor = state.recordButtonTextColor,
         )
     }
+}
+
+@Composable
+private fun NotesListContent(
+    modifier: Modifier = Modifier,
+    state: NotesListVisualState,
+) {
+    LazyColumn(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(NotesScreenDefaults.SectionSpacing),
+        contentPadding = PaddingValues(
+            top = VoraSpacing.PageTop,
+            bottom = NotesScreenDefaults.ListBottomContentPadding,
+        ),
+    ) {
+        item {
+            NotesHeader(
+                titleColor = state.titleColor,
+                subtitleColor = state.subtitleColor,
+                statusBackground = state.statusChipBackground,
+                statusTextColor = state.statusChipTextColor,
+            )
+        }
+        item {
+            NotesSearchBar(
+                background = state.searchBackground,
+                borderColor = state.searchBorder,
+                textColor = state.metaColor,
+            )
+        }
+        item {
+            NotesFilterRow(
+                background = state.filterChipBackground,
+                textColor = state.filterChipTextColor,
+            )
+        }
+        item {
+            NotesRecentLabel(
+                textColor = state.metaColor,
+            )
+        }
+        items(
+            items = state.memos,
+            key = { memo -> "${memo.title}-${memo.time}-${memo.source}" },
+        ) { memo ->
+            MemoCard(
+                memo = memo,
+                titleColor = state.titleColor,
+                metaColor = state.metaColor,
+                cardBackground = state.cardBackground,
+                cardBorder = state.cardBorder,
+                sourceBackground = state.filterChipBackground,
+                sourceTextColor = state.filterChipTextColor,
+            )
+        }
+    }
+}
+
+private object NotesScreenDefaults {
+    val SectionSpacing = 14.dp
+    val ListBottomContentPadding = 104.dp
 }
 
 @Preview(name = "Phone Notes", showBackground = true, backgroundColor = 0xFFF9FAFB)
@@ -97,6 +117,33 @@ private fun NotesScreenPreview() {
             cardBackground = VoraColors.VoraWhite,
             cardBorder = androidx.compose.ui.graphics.Color(0xFFEDF2F5),
             metaColor = VoraColors.VoraMuted,
+            recordButtonBackground = androidx.compose.ui.graphics.Color(0xFFEF2B2A),
+            recordButtonTextColor = VoraColors.VoraWhite,
+            memos = listOf(
+                NoteListItemUi("Morning idea", "1:24", "Synced · Today, 8:42", "Phone"),
+                NoteListItemUi("Pickup notes", "0:48", "Queued · Today, 12:10", "Watch"),
+            ),
+        ),
+    )
+}
+
+@Preview(name = "Phone Notes Dark", showBackground = true, backgroundColor = 0xFF111827)
+@Composable
+private fun NotesScreenDarkPreview() {
+    NotesScreen(
+        state = NotesListVisualState(
+            background = VoraColors.LogoCharcoal,
+            titleColor = VoraColors.LogoPaper,
+            subtitleColor = VoraColors.VoraMuted.copy(alpha = 0.72f),
+            statusChipBackground = androidx.compose.ui.graphics.Color(0xFF2F6A4F),
+            statusChipTextColor = VoraColors.LogoPaper,
+            filterChipBackground = androidx.compose.ui.graphics.Color(0xFF1D2736),
+            filterChipTextColor = VoraColors.LogoPaper,
+            searchBackground = androidx.compose.ui.graphics.Color(0xFF1B2432),
+            searchBorder = androidx.compose.ui.graphics.Color(0xFF24314F),
+            cardBackground = androidx.compose.ui.graphics.Color(0xFF161F2D),
+            cardBorder = androidx.compose.ui.graphics.Color(0xFF202C3D),
+            metaColor = androidx.compose.ui.graphics.Color(0xFFB8C1CD),
             recordButtonBackground = androidx.compose.ui.graphics.Color(0xFFEF2B2A),
             recordButtonTextColor = VoraColors.VoraWhite,
             memos = listOf(

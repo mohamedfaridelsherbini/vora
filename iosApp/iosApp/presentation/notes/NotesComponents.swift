@@ -14,7 +14,12 @@ struct NotesHeader: View {
                 Text("12 memos · 18 min")
                     .font(.voraLabel)
                     .foregroundStyle(metaColor)
-                StatusChip(label: "Synced", background: .voraSuccess, text: .voraWhite)
+                StatusChip(
+                    label: "Synced",
+                    background: .voraSuccess,
+                    text: .voraWhite,
+                    iconName: "checkmark.circle.fill"
+                )
             }
         }
     }
@@ -27,8 +32,8 @@ struct NotesSearchBar: View {
 
     var body: some View {
         HStack(spacing: 10) {
-            Text("Q")
-                .font(.voraLabel)
+            Image(systemName: "magnifyingglass")
+                .font(.system(size: 14, weight: .semibold))
                 .foregroundStyle(textColor.opacity(0.65))
 
             Text("Search transcripts")
@@ -51,8 +56,14 @@ struct NotesFilterRow: View {
     var body: some View {
         HStack(spacing: 8) {
             FilterChip(label: "All 12", selected: true)
-            FilterChip(label: "Pending 2", selected: false)
-            FilterChip(label: "Needs review", selected: false, background: Color(hex: 0xF9ECE8), text: Color(hex: 0xC95B4A))
+            FilterChip(label: "Pending 2", selected: false, iconName: "arrow.triangle.2.circlepath")
+            FilterChip(
+                label: "Needs review",
+                selected: false,
+                background: Color(hex: 0xF9ECE8),
+                text: Color(hex: 0xC95B4A),
+                iconName: "exclamationmark.circle"
+            )
         }
     }
 }
@@ -62,15 +73,22 @@ struct FilterChip: View {
     let selected: Bool
     var background: Color = Color(hex: 0xEFF4F7)
     var text: Color = .voraLogoInk
+    var iconName: String? = nil
 
     var body: some View {
-        Text(label)
-            .font(.voraLabel)
-            .foregroundStyle(selected ? .voraWhite : text)
-            .padding(.horizontal, VoraSpacing.chipHorizontal)
-            .padding(.vertical, VoraSpacing.chipVertical)
-            .background(selected ? Color.voraLogoInk : background)
-            .clipShape(Capsule())
+        HStack(spacing: 6) {
+            if let iconName {
+                Image(systemName: iconName)
+                    .font(.system(size: 11, weight: .semibold))
+            }
+            Text(label)
+                .font(.voraLabel)
+        }
+        .foregroundStyle(selected ? .voraWhite : text)
+        .padding(.horizontal, VoraSpacing.chipHorizontal)
+        .padding(.vertical, VoraSpacing.chipVertical)
+        .background(selected ? Color.voraLogoInk : background)
+        .clipShape(Capsule())
     }
 }
 
@@ -78,15 +96,37 @@ struct StatusChip: View {
     let label: String
     let background: Color
     let text: Color
+    var iconName: String? = nil
 
     var body: some View {
-        Text(label)
-            .font(.voraLabel)
-            .foregroundStyle(text)
-            .padding(.horizontal, VoraSpacing.chipHorizontal)
-            .padding(.vertical, VoraSpacing.chipVertical)
-            .background(background)
-            .clipShape(Capsule())
+        HStack(spacing: 6) {
+            if let iconName {
+                Image(systemName: iconName)
+                    .font(.system(size: 11, weight: .semibold))
+            }
+            Text(label)
+                .font(.voraLabel)
+        }
+        .foregroundStyle(text)
+        .padding(.horizontal, VoraSpacing.chipHorizontal)
+        .padding(.vertical, VoraSpacing.chipVertical)
+        .background(background)
+        .clipShape(Capsule())
+    }
+}
+
+private extension String {
+    var sourceIconName: String {
+        switch self {
+        case "Phone":
+            return "iphone"
+        case "Watch":
+            return "applewatch"
+        case "Car":
+            return "car.fill"
+        default:
+            return "circle.fill"
+        }
     }
 }
 
@@ -120,7 +160,12 @@ struct MemoCard: View {
 
             HStack {
                 Spacer()
-                StatusChip(label: memo.source, background: sourceBackground, text: sourceTextColor)
+                StatusChip(
+                    label: memo.source,
+                    background: sourceBackground,
+                    text: sourceTextColor,
+                    iconName: memo.source.sourceIconName
+                )
             }
         }
         .padding(.horizontal, VoraSpacing.cardHorizontal)
@@ -141,8 +186,8 @@ struct RecordButton: View {
                 .fill(Color(hex: 0xEF2B2A))
                 .frame(width: 64, height: 64)
 
-            Text("Rec")
-                .font(.voraLabelLarge)
+            Image(systemName: "mic.fill")
+                .font(.system(size: 22, weight: .semibold))
                 .foregroundStyle(.white)
         }
     }
