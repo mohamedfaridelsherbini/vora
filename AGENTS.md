@@ -68,6 +68,53 @@ This file defines how coding agents operate in Vora. It is a delivery contract f
 - Constructor injection is the default. Service locator style access is forbidden except where a platform framework forces it at the boundary.
 - Dispatchers, clocks, ID generators, and other environment dependencies must be injectable.
 
+## UI Structure Contract
+
+All platform UI must use the same responsibility split. Do not keep routing, state, layout, and leaf components in one file once a screen is beyond trivial bootstrap code.
+
+### Required screen split
+
+| Layer | Responsibility | Android / Wear / Car example | iOS / watchOS example |
+| --- | --- | --- | --- |
+| App entry | platform entry point only | `App.kt`, `WearEntryActivity.kt`, `CarEntryActivity.kt` | `ContentView.swift`, `WatchRecordView.swift` |
+| Route | startup handoff, navigation choice, state-owner binding | `NotesRoute.kt`, `CaptureRoute.kt`, `HomeRoute.kt` | `NotesRoute.swift`, `WatchCaptureRoute.swift` |
+| UI state | immutable screen state and visual state types | `NotesUiState.kt`, `SplashUiState.kt`, `HomeUiState.kt` | `NotesModels.swift` |
+| Screen | top-level feature layout and section composition | `NotesScreen.kt`, `CaptureScreen.kt`, `HomeScreen.kt` | `NotesScreen.swift`, `WatchCaptureScreen.swift` |
+| Components | reusable feature-level UI parts | `NotesComponents.kt` | `NotesComponents.swift` |
+| Theme | tokens, spacing, colors, typography | `presentation/theme/` | `presentation/theme/` |
+
+### Feature-first UI folders
+
+- Android mobile: `composeApp/src/androidMain/kotlin/.../presentation/<feature>/`
+- iPhone: `iosApp/iosApp/presentation/<feature>/`
+- Wear OS: `wearApp/src/main/java/.../presentation/<feature>/`
+- Apple Watch: `iosApp/VoraWatch Watch App/presentation/<feature>/`
+- Car: `carApp/src/main/java/.../presentation/<feature>/`
+
+### Current expected structure
+
+- Android mobile:
+  - `presentation/splash/`
+  - `presentation/notes/`
+- iPhone:
+  - `presentation/splash/`
+  - `presentation/notes/`
+- Wear OS:
+  - `presentation/capture/`
+- Apple Watch:
+  - `presentation/capture/`
+- Car:
+  - `presentation/home/`
+
+### UI file rules
+
+- Entry files may host platform bootstrapping only. They must not contain full page UI trees.
+- Route files may orchestrate timing, navigation, and state selection. They must not become rendering-heavy.
+- Screen files compose sections and own page-level layout only.
+- Components files own headers, cards, chips, search bars, buttons, and other reusable feature UI parts.
+- UI state files own immutable screen contracts. Do not bury state types inside unrelated files.
+- If a page starts mixing route logic, state, and reusable sections, split it before adding more behavior.
+
 ## Ownership Matrix
 
 | Area | Primary agent | Required reviewer |
@@ -195,6 +242,7 @@ Deliver production Android behavior for handheld capture, playback, storage, and
 - Are main-thread blocking calls avoided?
 - Are repositories, use cases, and services injected instead of manually created in UI or activities?
 - Is the route/container/content split clear where the screen is non-trivial?
+- Does the feature follow `presentation/<feature>/Route + UiState + Screen + Components` instead of a single large page file?
 - Does each composable have one rendering responsibility?
 - Are child composable parameters narrow and role-specific instead of whole-screen objects by default?
 - Can design-system or leaf components be previewed without constructing app dependencies?
@@ -240,6 +288,7 @@ Deliver Apple-native experiences while reusing shared business logic instead of 
 - Is AVAudioSession ownership explicit?
 - Does Swift code consume shared contracts rather than replacing them?
 - Are services and coordinators injected into state owners instead of created inside views?
+- Does the feature use `Route + Models/UiState + Screen + Components` instead of a giant SwiftUI file?
 
 **Anti-patterns**
 
