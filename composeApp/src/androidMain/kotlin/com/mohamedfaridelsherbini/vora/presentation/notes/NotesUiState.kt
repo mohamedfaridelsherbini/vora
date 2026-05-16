@@ -27,19 +27,18 @@ internal enum class NotesListMode {
 }
 
 internal data class RenameDialogState(
-    val memoId: String,
-    val currentTitle: String,
+    val memo: NoteListItemUi,
 )
 
 internal data class DeleteDialogState(
-    val memoId: String,
-    val memoTitle: String,
+    val memo: NoteListItemUi,
 )
 
 internal data class NotesUiState(
     val mode: NotesListMode,
     val summaryText: String,
     val statusLabel: String,
+    val searchQuery: String,
     val filters: List<NotesSourceFilterUi>,
     val memos: List<NoteListItemUi>,
     val renameDialog: RenameDialogState? = null,
@@ -57,8 +56,10 @@ internal data class NotesListVisualState(
     val statusChipTextColor: Color,
     val filterChipBackground: Color,
     val filterChipTextColor: Color,
+    val searchQuery: String,
     val searchBackground: Color,
     val searchBorder: Color,
+    val searchTextColor: Color,
     val cardBackground: Color,
     val cardBorder: Color,
     val emptyStateBackground: Color,
@@ -92,8 +93,10 @@ internal fun NotesUiState.toVisualState(dark: Boolean): NotesListVisualState = N
     },
     filterChipBackground = if (dark) Color(0xFF1D2736) else Color(0xFFEFF4F7),
     filterChipTextColor = if (dark) VoraColors.LogoPaper else VoraColors.LogoInk,
+    searchQuery = searchQuery,
     searchBackground = if (dark) Color(0xFF1B2432) else VoraColors.VoraWhite,
     searchBorder = if (dark) Color(0xFF24314F) else Color(0xFFE7EDF3),
+    searchTextColor = if (dark) Color(0xFFE4E9EF) else Color(0xFF16202A),
     cardBackground = if (dark) Color(0xFF161F2D) else VoraColors.VoraWhite,
     cardBorder = if (dark) Color(0xFF202C3D) else Color(0xFFEDF2F5),
     emptyStateBackground = if (dark) Color(0xFF161F2D) else Color(0xFFF7F9FB),
@@ -118,6 +121,7 @@ internal fun previewLoadedNotesUiState(): NotesUiState = NotesUiState(
     mode = NotesListMode.Loaded,
     summaryText = "12 memos · 18 min",
     statusLabel = "Synced",
+    searchQuery = "",
     filters = listOf(
         NotesSourceFilterUi("all", "All", 12, true),
         NotesSourceFilterUi("phone", "Phone", 7, false),
@@ -134,6 +138,7 @@ internal fun previewEmptyNotesUiState(): NotesUiState = NotesUiState(
     mode = NotesListMode.Empty,
     summaryText = "0 memos",
     statusLabel = "Synced",
+    searchQuery = "",
     filters = listOf(
         NotesSourceFilterUi("all", "All", 0, true),
         NotesSourceFilterUi("phone", "Phone", 0, false),
@@ -147,6 +152,7 @@ internal fun previewLoadingNotesUiState(): NotesUiState = NotesUiState(
     mode = NotesListMode.Loading,
     summaryText = "Loading local library",
     statusLabel = "Syncing",
+    searchQuery = "",
     filters = listOf(
         NotesSourceFilterUi("all", "All", 0, true),
         NotesSourceFilterUi("phone", "Phone", 0, false),

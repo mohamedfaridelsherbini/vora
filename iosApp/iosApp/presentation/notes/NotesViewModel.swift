@@ -8,6 +8,7 @@ final class NotesViewModel: ObservableObject {
     @Published var statusLabel: String = "Syncing"
     @Published var filters: [NotesSourceFilterItem] = []
     @Published var memos: [MemoListItem] = []
+    @Published var searchQuery: String = ""
     @Published var renameDialog: RenameDialogState? = nil
     @Published var deleteDialog: DeleteDialogState? = nil
 
@@ -18,6 +19,7 @@ final class NotesViewModel: ObservableObject {
             mode = .empty
             summaryText = "0 memos"
             statusLabel = "Synced"
+            searchQuery = ""
             memos = []
             return
         }
@@ -33,13 +35,13 @@ final class NotesViewModel: ObservableObject {
 
     func requestRename(id: String) {
         guard let memo = memos.first(where: { $0.id == id }) else { return }
-        renameDialog = RenameDialogState(memoId: id, currentTitle: memo.title)
+        renameDialog = RenameDialogState(memo: memo)
     }
 
     func confirmRename(newTitle: String) async {
         guard let dialog = renameDialog else { return }
         renameDialog = nil
-        _ = try? await bridge.renameMemo(id: dialog.memoId, newTitle: newTitle)
+        _ = try? await bridge.renameMemo(id: dialog.memo.id, newTitle: newTitle)
         await load()
     }
 
@@ -51,13 +53,13 @@ final class NotesViewModel: ObservableObject {
 
     func requestDelete(id: String) {
         guard let memo = memos.first(where: { $0.id == id }) else { return }
-        deleteDialog = DeleteDialogState(memoId: id, memoTitle: memo.title)
+        deleteDialog = DeleteDialogState(memo: memo)
     }
 
     func confirmDelete() async {
         guard let dialog = deleteDialog else { return }
         deleteDialog = nil
-        _ = try? await bridge.deleteMemo(id: dialog.memoId)
+        _ = try? await bridge.deleteMemo(id: dialog.memo.id)
         await load()
     }
 
@@ -72,10 +74,16 @@ final class NotesViewModel: ObservableObject {
         await load()
     }
 
+    func updateSearchQuery(_ query: String) async {
+        bridge.updateSearchQuery(query: query)
+        await load()
+    }
+
     private func apply(snapshot: NotesSnapshot) {
         mode = snapshot.mode.toScreenMode()
         summaryText = snapshot.summaryText
         statusLabel = snapshot.statusLabel
+        searchQuery = snapshot.searchQuery
         filters = snapshot.filters.map { filter in
             NotesSourceFilterItem(
                 key: filter.key,

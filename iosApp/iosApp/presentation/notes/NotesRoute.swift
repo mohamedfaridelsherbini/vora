@@ -14,10 +14,14 @@ struct NotesRoute: View {
                     mode: notesViewModel.mode,
                     summaryText: notesViewModel.summaryText,
                     statusLabel: notesViewModel.statusLabel,
+                    searchQuery: notesViewModel.searchQuery,
                     filters: notesViewModel.filters,
                     memos: notesViewModel.memos,
                     onRecordClick: {
                         Task { await notesViewModel.insertMemo() }
+                    },
+                    onSearchQueryChange: { query in
+                        Task { await notesViewModel.updateSearchQuery(query) }
                     },
                     onSelectSourceFilter: { key in
                         Task { await notesViewModel.selectSourceFilter(key: key) }
@@ -42,7 +46,7 @@ struct NotesRoute: View {
         // ── Rename sheet ────────────────────────────────────────────────────
         .sheet(item: $notesViewModel.renameDialog) { dialog in
             VoraRenameSheet(
-                currentTitle: dialog.currentTitle,
+                memo: dialog.memo,
                 onSave: { newTitle in
                     Task { await notesViewModel.confirmRename(newTitle: newTitle) }
                 },
@@ -50,32 +54,32 @@ struct NotesRoute: View {
                     notesViewModel.dismissRename()
                 }
             )
-            .presentationDetents([.height(240)])
+            .presentationDetents([.height(300)])
             .presentationDragIndicator(.visible)
         }
         // ── Delete confirmation ─────────────────────────────────────────────
-        .confirmationDialog(
-            deleteDialogTitle,
-            isPresented: Binding(
-                get: { notesViewModel.deleteDialog != nil },
-                set: { if !$0 { notesViewModel.dismissDelete() } }
-            ),
-            titleVisibility: .visible
-        ) {
-            Button("Delete", role: .destructive) {
-                Task { await notesViewModel.confirmDelete() }
-            }
-            Button("Cancel", role: .cancel) {
-                notesViewModel.dismissDelete()
-            }
-        } message: {
-            if let title = notesViewModel.deleteDialog?.memoTitle {
-                Text("\u{201C}\(title)\u{201D} will be permanently deleted and cannot be recovered.")
+        .overlay {
+            if let dialog = notesViewModel.deleteDialog {
+                ZStack {
+                    Color.black.opacity(0.4)
+                        .ignoresSafeArea()
+                        .onTapGesture {
+                            notesViewModel.dismissDelete()
+                        }
+                    
+                    VoraDeleteModal(
+                        memo: dialog.memo,
+                        onConfirm: {
+                            Task { await notesViewModel.confirmDelete() }
+                        },
+                        onCancel: {
+                            notesViewModel.dismissDelete()
+                        }
+                    )
+                }
+                .transition(.opacity)
+                .animation(.easeInOut, value: notesViewModel.deleteDialog != nil)
             }
         }
-    }
-
-    private var deleteDialogTitle: String {
-        notesViewModel.deleteDialog.map { "Delete \"\($0.memoTitle)\"?" } ?? "Delete memo?"
     }
 }

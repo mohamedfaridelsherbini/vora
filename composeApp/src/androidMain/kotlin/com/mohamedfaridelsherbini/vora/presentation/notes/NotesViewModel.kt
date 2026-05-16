@@ -33,11 +33,11 @@ internal class NotesViewModel(
 
     fun requestRename(id: String) {
         val memo = _uiState.value.memos.firstOrNull { it.id == id } ?: return
-        _uiState.update { it.copy(renameDialog = RenameDialogState(memoId = id, currentTitle = memo.title)) }
+        _uiState.update { it.copy(renameDialog = RenameDialogState(memo)) }
     }
 
     fun confirmRename(newTitle: String) {
-        val id = _uiState.value.renameDialog?.memoId ?: return
+        val id = _uiState.value.renameDialog?.memo?.id ?: return
         _uiState.update { it.copy(renameDialog = null) }
         viewModelScope.launch {
             notesFeatureService.renameMemo(id = id, newTitle = newTitle)
@@ -53,11 +53,11 @@ internal class NotesViewModel(
 
     fun requestDelete(id: String) {
         val memo = _uiState.value.memos.firstOrNull { it.id == id } ?: return
-        _uiState.update { it.copy(deleteDialog = DeleteDialogState(memoId = id, memoTitle = memo.title)) }
+        _uiState.update { it.copy(deleteDialog = DeleteDialogState(memo)) }
     }
 
     fun confirmDelete() {
-        val id = _uiState.value.deleteDialog?.memoId ?: return
+        val id = _uiState.value.deleteDialog?.memo?.id ?: return
         _uiState.update { it.copy(deleteDialog = null) }
         viewModelScope.launch {
             notesFeatureService.deleteMemo(id)
@@ -73,6 +73,11 @@ internal class NotesViewModel(
 
     fun selectSourceFilter(key: String) {
         notesFeatureService.selectSourceFilter(key)
+        refreshNotes()
+    }
+
+    fun onSearchQueryChange(query: String) {
+        notesFeatureService.updateSearchQuery(query)
         refreshNotes()
     }
 
@@ -107,6 +112,7 @@ private fun NotesSnapshot.toUiState(): NotesUiState = NotesUiState(
     },
     summaryText = summaryText,
     statusLabel = statusLabel,
+    searchQuery = searchQuery,
     filters = filters.map { filter ->
         NotesSourceFilterUi(
             key = filter.key,

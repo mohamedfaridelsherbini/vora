@@ -7,9 +7,10 @@ class NotesSnapshotFactory {
     fun create(
         memos: List<VoiceMemo>,
         selectedFilter: NotesSourceFilter,
+        searchQuery: String,
     ): NotesSnapshot {
         val filters = selectedFilter.toFilterChips(memos)
-        val filteredMemos = memos.filterBy(selectedFilter)
+        val filteredMemos = memos.filterBy(selectedFilter).filterBySearch(searchQuery)
 
         if (filteredMemos.isEmpty()) {
             return NotesSnapshot(
@@ -17,6 +18,7 @@ class NotesSnapshotFactory {
                 summaryText = "0 memos",
                 statusLabel = "Synced",
                 selectedFilterKey = selectedFilter.key,
+                searchQuery = searchQuery,
                 filters = filters,
                 memos = emptyList(),
             )
@@ -27,9 +29,19 @@ class NotesSnapshotFactory {
             summaryText = "${filteredMemos.size} memos · ${filteredMemos.sumOf { it.durationMs }.toMinutesLabel()}",
             statusLabel = "Synced",
             selectedFilterKey = selectedFilter.key,
+            searchQuery = searchQuery,
             filters = filters,
             memos = filteredMemos.map(VoiceMemo::toNotesMemoItem),
         )
+    }
+}
+
+private fun List<VoiceMemo>.filterBySearch(query: String): List<VoiceMemo> {
+    val trimmed = query.trim()
+    if (trimmed.isEmpty()) return this
+    return filter { memo ->
+        memo.title.contains(trimmed, ignoreCase = true) ||
+            memo.createdAt.toCreatedAtLabel().contains(trimmed, ignoreCase = true)
     }
 }
 

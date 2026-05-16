@@ -11,11 +11,13 @@ class NotesFeatureService(
     private val voiceMemoMockFactory: VoiceMemoMockFactory,
 ) {
     private var selectedFilter = NotesSourceFilter.All
+    private var searchQuery = ""
 
     suspend fun loadSnapshot(): NotesSnapshot =
         snapshotFactory.create(
             memos = voiceMemoUseCases.observeVoiceMemos().first(),
             selectedFilter = selectedFilter,
+            searchQuery = searchQuery,
         )
 
     suspend fun insertMemo() {
@@ -48,6 +50,10 @@ class NotesFeatureService(
     fun selectSourceFilter(key: String) {
         selectedFilter = NotesSourceFilter.fromKey(key)
     }
+
+    fun updateSearchQuery(query: String) {
+        searchQuery = query
+    }
 }
 
 data class NotesSnapshot(
@@ -55,6 +61,7 @@ data class NotesSnapshot(
     val summaryText: String,
     val statusLabel: String,
     val selectedFilterKey: String,
+    val searchQuery: String,
     val filters: List<NotesSourceFilterChip>,
     val memos: List<NotesMemoItem>,
 )

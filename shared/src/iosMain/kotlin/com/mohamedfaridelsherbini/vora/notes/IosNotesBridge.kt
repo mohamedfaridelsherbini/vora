@@ -23,4 +23,8 @@ class IosNotesBridge {
     fun selectSourceFilter(key: String) {
         notesFeatureService.selectSourceFilter(key)
     }
+
+    fun updateSearchQuery(query: String) {
+        notesFeatureService.updateSearchQuery(query)
+    }
 }

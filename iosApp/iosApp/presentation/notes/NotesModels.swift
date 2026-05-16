@@ -26,13 +26,11 @@ struct NotesSourceFilterItem: Identifiable {
 
 struct RenameDialogState: Identifiable {
     let id = UUID()
-    let memoId: String
-    let currentTitle: String
+    let memo: MemoListItem
 }
 
 struct DeleteDialogState: Identifiable {
     let id = UUID()
-    let memoId: String
-    let memoTitle: String
+    let memo: MemoListItem
 }
 

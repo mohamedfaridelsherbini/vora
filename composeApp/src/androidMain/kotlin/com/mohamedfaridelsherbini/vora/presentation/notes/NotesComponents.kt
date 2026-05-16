@@ -29,6 +29,18 @@ import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Sync
 import androidx.compose.material.icons.outlined.Watch
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.ui.window.Dialog
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.Surface
+import androidx.compose.material3.IconButton
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
@@ -54,47 +66,91 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.outlined.Close
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.IntOffset
+import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 import com.mohamedfaridelsherbini.vora.presentation.theme.VoraColors
 import com.mohamedfaridelsherbini.vora.presentation.theme.VoraSpacing
 import com.mohamedfaridelsherbini.vora.presentation.theme.interFontFamily
 
 // ── Dialogs ──────────────────────────────────────────────────────────────────
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun VoraRenameDialog(
-    currentTitle: String,
+internal fun VoraRenameBottomSheet(
+    memo: NoteListItemUi,
     onConfirm: (String) -> Unit,
     onDismiss: () -> Unit,
 ) {
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val focusRequester = remember { FocusRequester() }
+    val isDark = isSystemInDarkTheme()
+    
     var fieldValue by remember {
         mutableStateOf(
             TextFieldValue(
-                text = currentTitle,
-                selection = TextRange(0, currentTitle.length),
+                text = memo.title,
+                selection = TextRange(0, memo.title.length),
             ),
         )
     }
     val trimmed = fieldValue.text.trim()
-    val canSave = trimmed.isNotBlank() && trimmed != currentTitle.trim()
+    val canSave = trimmed.isNotBlank() && trimmed != memo.title.trim()
 
-    AlertDialog(
+    ModalBottomSheet(
         onDismissRequest = onDismiss,
-        title = {
+        sheetState = sheetState,
+        containerColor = if (isDark) Color(0xFF161F2D) else Color.White,
+        dragHandle = {
+            Box(
+                modifier = Modifier
+                    .padding(top = 16.dp, bottom = 8.dp)
+                    .size(width = 32.dp, height = 4.dp)
+                    .background(Color(0xFFE0E5EA), CircleShape)
+            )
+        },
+        shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp)
+                .padding(bottom = 32.dp)
+        ) {
             Text(
                 text = "Rename memo",
                 fontFamily = interFontFamily(),
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp,
+                color = if (isDark) Color.White else VoraColors.LogoInk
             )
-        },
-        text = {
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = "Recorded ${memo.time} · ${memo.source} · ${memo.subtitle}",
+                fontFamily = interFontFamily(),
+                fontWeight = FontWeight.Medium,
+                fontSize = 12.sp,
+                color = VoraColors.VoraMuted
+            )
+            
+            Spacer(modifier = Modifier.height(24.dp))
+            
             OutlinedTextField(
                 modifier = Modifier
                     .fillMaxWidth()
                     .focusRequester(focusRequester),
                 value = fieldValue,
-                onValueChange = { fieldValue = it },
+                onValueChange = { if (it.text.length <= 80) fieldValue = it },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(
@@ -102,90 +158,327 @@ internal fun VoraRenameDialog(
                 ),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = VoraColors.LogoInk,
-                    unfocusedBorderColor = VoraColors.VoraMuted.copy(alpha = 0.4f),
+                    unfocusedBorderColor = if (isDark) Color(0xFF24314F) else Color(0xFFE7EDF3),
+                    focusedContainerColor = if (isDark) Color(0xFF161F2D) else Color(0xFFF5F7FA),
+                    unfocusedContainerColor = if (isDark) Color(0xFF161F2D) else Color(0xFFF5F7FA),
+                    focusedTextColor = if (isDark) Color.White else VoraColors.LogoInk,
+                    unfocusedTextColor = if (isDark) Color.White else VoraColors.LogoInk,
                 ),
                 textStyle = androidx.compose.ui.text.TextStyle(
                     fontFamily = interFontFamily(),
                     fontWeight = FontWeight.Medium,
                     fontSize = 15.sp,
                 ),
+                shape = RoundedCornerShape(12.dp),
+                trailingIcon = {
+                    if (fieldValue.text.isNotEmpty()) {
+                        IconButton(onClick = { fieldValue = TextFieldValue("") }) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Clear",
+                                tint = VoraColors.VoraMuted,
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
+                    }
+                }
             )
-        },
-        confirmButton = {
-            TextButton(
-                onClick = { onConfirm(trimmed) },
-                enabled = canSave,
+            
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "Save",
+                    text = "Names appear in the list and in transcripts.",
                     fontFamily = interFontFamily(),
-                    fontWeight = FontWeight.SemiBold,
-                    color = if (canSave) VoraColors.LogoInk else VoraColors.VoraMuted.copy(alpha = 0.5f),
+                    fontSize = 12.sp,
+                    color = VoraColors.VoraMuted
                 )
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
                 Text(
-                    text = "Cancel",
+                    text = "${fieldValue.text.length} / 80",
                     fontFamily = interFontFamily(),
-                    fontWeight = FontWeight.Medium,
-                    color = VoraColors.VoraMuted,
+                    fontSize = 12.sp,
+                    color = VoraColors.VoraMuted
                 )
             }
-        },
-    )
+            
+            Spacer(modifier = Modifier.height(24.dp))
+            
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(48.dp)
+                        .background(
+                            if (isDark) Color(0xFF1D2633) else Color.White,
+                            RoundedCornerShape(12.dp)
+                        )
+                        .border(
+                            1.dp,
+                            if (isDark) Color(0xFF24314F) else Color(0xFFE7EDF3),
+                            RoundedCornerShape(12.dp)
+                        )
+                        .clickable(onClick = onDismiss),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "Cancel",
+                        fontFamily = interFontFamily(),
+                        fontWeight = FontWeight.Medium,
+                        color = VoraColors.VoraMuted
+                    )
+                }
+                
+                val saveBg = if (canSave) (if (isDark) Color.White else Color(0xFF1A1D20)) else Color(0xFFE0E5EA)
+                val saveFg = if (canSave) (if (isDark) Color(0xFF1A1D20) else Color.White) else VoraColors.VoraMuted
+                
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(48.dp)
+                        .background(saveBg, RoundedCornerShape(12.dp))
+                        .clickable(enabled = canSave, onClick = { onConfirm(trimmed) }),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        if (isDark && canSave) {
+                            Icon(
+                                imageVector = Icons.Default.Check,
+                                contentDescription = null,
+                                tint = saveFg,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(Modifier.width(8.dp))
+                        }
+                        Text(
+                            text = "Save",
+                            fontFamily = interFontFamily(),
+                            fontWeight = FontWeight.SemiBold,
+                            color = saveFg
+                        )
+                    }
+                }
+            }
+        }
+    }
 
     LaunchedEffect(Unit) { focusRequester.requestFocus() }
 }
 
 @Composable
 internal fun VoraDeleteDialog(
-    memoTitle: String,
+    memo: NoteListItemUi,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
 ) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = {
-            Text(
-                text = "Delete memo?",
-                fontFamily = interFontFamily(),
-                fontWeight = FontWeight.Bold,
-                fontSize = 18.sp,
-            )
-        },
-        text = {
-            Text(
-                text = "\u201c$memoTitle\u201d will be permanently deleted and cannot be recovered.",
-                fontFamily = interFontFamily(),
-                fontWeight = FontWeight.Medium,
-                fontSize = 14.sp,
-            )
-        },
-        confirmButton = {
-            TextButton(
-                onClick = onConfirm,
-                colors = ButtonDefaults.textButtonColors(contentColor = VoraColors.Danger),
+    val isDark = isSystemInDarkTheme()
+    Dialog(onDismissRequest = onDismiss) {
+        Surface(
+            shape = RoundedCornerShape(24.dp),
+            color = if (isDark) Color(0xFF161F2D) else Color.White,
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                // Icon
+                Box(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .background(
+                            if (isDark) Color(0xFF3B1A1A) else Color(0xFFFDE8E8),
+                            CircleShape
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = null,
+                        tint = VoraColors.Danger
+                    )
+                }
+                
+                Spacer(modifier = Modifier.height(16.dp))
+                
                 Text(
-                    text = "Delete",
+                    text = "Delete this memo?",
                     fontFamily = interFontFamily(),
-                    fontWeight = FontWeight.SemiBold,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp,
+                    color = if (isDark) Color.White else VoraColors.LogoInk,
+                    textAlign = TextAlign.Center
                 )
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
+                
+                Spacer(modifier = Modifier.height(8.dp))
+                
                 Text(
-                    text = "Cancel",
+                    text = "${memo.title} · ${memo.subtitle} will be permanently removed from this device. This can't be undone.",
                     fontFamily = interFontFamily(),
                     fontWeight = FontWeight.Medium,
+                    fontSize = 14.sp,
                     color = VoraColors.VoraMuted,
+                    textAlign = TextAlign.Center
+                )
+                
+                Spacer(modifier = Modifier.height(24.dp))
+                
+                // Delete button
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp)
+                        .background(VoraColors.Danger, RoundedCornerShape(12.dp))
+                        .clickable(onClick = onConfirm),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        if (isDark) {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = null,
+                                tint = Color.White,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(Modifier.width(8.dp))
+                        }
+                        Text(
+                            text = "Delete memo",
+                            fontFamily = interFontFamily(),
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color.White
+                        )
+                    }
+                }
+                
+                Spacer(modifier = Modifier.height(8.dp))
+                
+                // Cancel button
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp)
+                        .clickable(
+                            onClick = onDismiss,
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "Cancel",
+                        fontFamily = interFontFamily(),
+                        fontWeight = FontWeight.Medium,
+                        color = if (isDark) Color.White else Color(0xFF1A1D20)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ActionBlock(
+    text: String,
+    icon: ImageVector,
+    backgroundColor: Color,
+    onClick: () -> Unit,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxHeight()
+            .width(74.dp)
+            .background(backgroundColor, RoundedCornerShape(18.dp))
+            .clickable(onClick = onClick),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Icon(icon, contentDescription = null, tint = Color.White)
+        Spacer(Modifier.height(4.dp))
+        Text(text, color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Medium, fontFamily = interFontFamily())
+    }
+}
+
+@Composable
+internal fun SwipeRevealItem(
+    onRename: () -> Unit,
+    onDelete: () -> Unit,
+    content: @Composable () -> Unit,
+) {
+    val density = LocalDensity.current
+    val actionWidthPx = with(density) { 164.dp.toPx() } // 74 * 2 + 8 spacing + 8 start spacing
+    val offsetX = remember { Animatable(0f) }
+    val scope = rememberCoroutineScope()
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .pointerInput(Unit) {
+                detectHorizontalDragGestures(
+                    onDragEnd = {
+                        scope.launch {
+                            val target = if (offsetX.value < -actionWidthPx / 2) -actionWidthPx else 0f
+                            offsetX.animateTo(target, tween(300))
+                        }
+                    },
+                    onDragCancel = {
+                        scope.launch { offsetX.animateTo(0f, tween(300)) }
+                    },
+                    onHorizontalDrag = { _, dragAmount ->
+                        scope.launch {
+                            val newOffset = (offsetX.value + dragAmount).coerceIn(-actionWidthPx, 0f)
+                            offsetX.snapTo(newOffset)
+                        }
+                    }
                 )
             }
-        },
-    )
+    ) {
+        // Background actions
+        Row(
+            modifier = Modifier.matchParentSize().padding(start = 8.dp),
+            horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            ActionBlock(
+                text = "Rename",
+                icon = Icons.Outlined.Edit,
+                backgroundColor = Color(0xFF607078),
+                onClick = {
+                    scope.launch { offsetX.animateTo(0f) }
+                    onRename()
+                }
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            ActionBlock(
+                text = "Delete",
+                icon = Icons.Outlined.DeleteOutline,
+                backgroundColor = VoraColors.Danger,
+                onClick = {
+                    scope.launch { offsetX.animateTo(0f) }
+                    onDelete()
+                }
+            )
+        }
+
+        // Foreground content
+        Box(
+            modifier = Modifier.offset { IntOffset(offsetX.value.roundToInt(), 0) }
+        ) {
+            content()
+        }
+    }
 }
 
 // ── List components ───────────────────────────────────────────────────────────
@@ -230,33 +523,68 @@ internal fun NotesHeader(
 
 @Composable
 internal fun NotesSearchBar(
+    query: String,
+    onQueryChange: (String) -> Unit,
     background: Color,
     borderColor: Color,
     textColor: Color,
+    iconColor: Color,
 ) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(background, RoundedCornerShape(16.dp))
-            .border(1.dp, borderColor, RoundedCornerShape(16.dp))
-            .padding(horizontal = VoraSpacing.SearchHorizontal, vertical = VoraSpacing.SearchVertical),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(10.dp),
-    ) {
-        Icon(
-            imageVector = Icons.Outlined.Search,
-            contentDescription = null,
-            tint = textColor.copy(alpha = 0.65f),
-            modifier = Modifier.size(16.dp),
-        )
-        Text(
-            text = "Search transcripts",
+    androidx.compose.foundation.text.BasicTextField(
+        value = query,
+        onValueChange = onQueryChange,
+        textStyle = androidx.compose.ui.text.TextStyle(
             color = textColor.copy(alpha = 0.85f),
             fontFamily = interFontFamily(),
             fontWeight = FontWeight.Medium,
             fontSize = 14.sp,
-        )
-    }
+        ),
+        singleLine = true,
+        cursorBrush = androidx.compose.ui.graphics.SolidColor(textColor),
+        decorationBox = { innerTextField ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(background, RoundedCornerShape(16.dp))
+                    .border(1.dp, borderColor, RoundedCornerShape(16.dp))
+                    .padding(horizontal = VoraSpacing.SearchHorizontal, vertical = VoraSpacing.SearchVertical),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.Search,
+                    contentDescription = null,
+                    tint = iconColor.copy(alpha = 0.65f),
+                    modifier = Modifier.size(16.dp),
+                )
+                Box(modifier = Modifier.weight(1f)) {
+                    if (query.isEmpty()) {
+                        Text(
+                            text = "Search transcripts",
+                            color = iconColor.copy(alpha = 0.65f),
+                            fontFamily = interFontFamily(),
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 14.sp,
+                        )
+                    }
+                    innerTextField()
+                }
+                if (query.isNotEmpty()) {
+                    IconButton(
+                        onClick = { onQueryChange("") },
+                        modifier = Modifier.size(16.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.Close,
+                            contentDescription = "Clear search",
+                            tint = iconColor.copy(alpha = 0.65f),
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+                }
+            }
+        }
+    )
 }
 
 @Composable
@@ -444,8 +772,6 @@ internal fun MemoCard(
     cardBorder: Color,
     sourceBackground: Color,
     sourceTextColor: Color,
-    onRename: () -> Unit,
-    onDelete: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -482,23 +808,9 @@ internal fun MemoCard(
         }
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
+            horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Row(horizontalArrangement = Arrangement.spacedBy(14.dp), verticalAlignment = Alignment.CenterVertically) {
-                MemoAction(
-                    label = "Rename",
-                    icon = Icons.Outlined.Edit,
-                    tint = metaColor,
-                    onClick = onRename,
-                )
-                MemoAction(
-                    label = "Delete",
-                    icon = Icons.Outlined.DeleteOutline,
-                    tint = VoraColors.Danger,
-                    onClick = onDelete,
-                )
-            }
             StatusChip(
                 label = memo.source,
                 background = sourceBackground,
@@ -532,33 +844,6 @@ internal fun RecordFab(
     }
 }
 
-@Composable
-private fun MemoAction(
-    label: String,
-    icon: ImageVector,
-    tint: Color,
-    onClick: () -> Unit,
-) {
-    Row(
-        modifier = Modifier.clickable(onClick = onClick),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = label,
-            tint = tint,
-            modifier = Modifier.size(14.dp),
-        )
-        Text(
-            text = label,
-            color = tint,
-            fontFamily = interFontFamily(),
-            fontWeight = FontWeight.Medium,
-            fontSize = 12.sp,
-        )
-    }
-}
 
 @Composable
 private fun StatusChip(

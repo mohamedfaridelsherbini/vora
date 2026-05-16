@@ -20,6 +20,7 @@ internal fun NotesScreen(state: NotesListVisualState) {
     NotesScreen(
         state = state,
         onRecordClick = {},
+        onSearchQueryChange = {},
         onSelectSourceFilter = {},
         onRenameRequest = {},
         onDeleteRequest = {},
@@ -34,6 +35,7 @@ internal fun NotesScreen(state: NotesListVisualState) {
 internal fun NotesScreen(
     state: NotesListVisualState,
     onRecordClick: () -> Unit,
+    onSearchQueryChange: (String) -> Unit,
     onSelectSourceFilter: (String) -> Unit,
     onRenameRequest: (String) -> Unit,
     onDeleteRequest: (String) -> Unit,
@@ -51,6 +53,7 @@ internal fun NotesScreen(
         NotesListContent(
             modifier = Modifier.fillMaxSize(),
             state = state,
+            onSearchQueryChange = onSearchQueryChange,
             onSelectSourceFilter = onSelectSourceFilter,
             onRenameRequest = onRenameRequest,
             onDeleteRequest = onDeleteRequest,
@@ -67,8 +70,8 @@ internal fun NotesScreen(
     }
 
     state.renameDialog?.let { dialog ->
-        VoraRenameDialog(
-            currentTitle = dialog.currentTitle,
+        VoraRenameBottomSheet(
+            memo = dialog.memo,
             onConfirm = onRenameConfirm,
             onDismiss = onDismissRename,
         )
@@ -76,7 +79,7 @@ internal fun NotesScreen(
 
     state.deleteDialog?.let { dialog ->
         VoraDeleteDialog(
-            memoTitle = dialog.memoTitle,
+            memo = dialog.memo,
             onConfirm = onDeleteConfirm,
             onDismiss = onDismissDelete,
         )
@@ -87,6 +90,7 @@ internal fun NotesScreen(
 private fun NotesListContent(
     modifier: Modifier = Modifier,
     state: NotesListVisualState,
+    onSearchQueryChange: (String) -> Unit,
     onSelectSourceFilter: (String) -> Unit,
     onRenameRequest: (String) -> Unit,
     onDeleteRequest: (String) -> Unit,
@@ -111,9 +115,12 @@ private fun NotesListContent(
         }
         item {
             NotesSearchBar(
+                query = state.searchQuery,
+                onQueryChange = onSearchQueryChange,
                 background = state.searchBackground,
                 borderColor = state.searchBorder,
-                textColor = state.metaColor,
+                textColor = state.searchTextColor,
+                iconColor = state.metaColor,
             )
         }
         when (state.mode) {
@@ -197,17 +204,20 @@ private fun androidx.compose.foundation.lazy.LazyListScope.loadedContent(
         items = state.memos,
         key = { memo -> memo.id },
     ) { memo ->
-        MemoCard(
-            memo = memo,
-            titleColor = state.titleColor,
-            metaColor = state.metaColor,
-            cardBackground = state.cardBackground,
-            cardBorder = state.cardBorder,
-            sourceBackground = state.filterChipBackground,
-            sourceTextColor = state.filterChipTextColor,
+        SwipeRevealItem(
             onRename = { onRenameRequest(memo.id) },
             onDelete = { onDeleteRequest(memo.id) },
-        )
+        ) {
+            MemoCard(
+                memo = memo,
+                titleColor = state.titleColor,
+                metaColor = state.metaColor,
+                cardBackground = state.cardBackground,
+                cardBorder = state.cardBorder,
+                sourceBackground = state.filterChipBackground,
+                sourceTextColor = state.filterChipTextColor,
+            )
+        }
     }
 }
 

@@ -21,8 +21,8 @@ internal fun Long.toMinutesLabel(): String {
 
 internal fun Long.toCreatedAtLabel(now: Long = currentTimeMillis()): String {
     val zone = TimeZone.currentSystemDefault()
-    val created = kotlinx.datetime.Instant.fromEpochMilliseconds(this).toLocalDateTime(zone)
-    val current = kotlinx.datetime.Instant.fromEpochMilliseconds(now).toLocalDateTime(zone)
+    val created = kotlin.time.Instant.fromEpochMilliseconds(this).toLocalDateTime(zone)
+    val current = kotlin.time.Instant.fromEpochMilliseconds(now).toLocalDateTime(zone)
     val createdDate = created.date
     val currentDate = current.date
     val prefix = when {

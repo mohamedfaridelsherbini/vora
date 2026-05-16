@@ -21,6 +21,7 @@ internal fun NotesRoute() {
     NotesScreen(
         state = notesListVisualState(uiState),
         onRecordClick = notesViewModel::insertMemo,
+        onSearchQueryChange = notesViewModel::onSearchQueryChange,
         onSelectSourceFilter = notesViewModel::selectSourceFilter,
         onRenameRequest = notesViewModel::requestRename,
         onDeleteRequest = notesViewModel::requestDelete,

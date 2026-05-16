@@ -5,9 +5,11 @@ struct NotesScreen: View {
     let mode: NotesScreenMode
     let summaryText: String
     let statusLabel: String
+    let searchQuery: String
     let filters: [NotesSourceFilterItem]
     let memos: [MemoListItem]
     let onRecordClick: () -> Void
+    let onSearchQueryChange: (String) -> Void
     let onSelectSourceFilter: (String) -> Void
     let onRenameMemo: (String) -> Void
     let onDeleteMemo: (String) -> Void
@@ -22,7 +24,15 @@ struct NotesScreen: View {
                         summaryText: summaryText,
                         statusLabel: statusLabel
                     )
-                    NotesSearchBar(textColor: metaColor, background: searchBackground, border: searchBorder)
+                    NotesSearchBar(
+                        query: Binding(
+                            get: { searchQuery },
+                            set: onSearchQueryChange
+                        ),
+                        textColor: metaColor,
+                        background: searchBackground,
+                        border: searchBorder
+                    )
 
                     if mode == .loading {
                         NotesLoadingFilterRow(
@@ -69,17 +79,20 @@ struct NotesScreen: View {
 
                         VStack(spacing: 12) {
                             ForEach(memos) { memo in
-                                MemoCard(
-                                    memo: memo,
-                                    background: cardBackground,
-                                    border: cardBorder,
-                                    titleColor: titleColor,
-                                    metaColor: metaColor,
-                                    sourceBackground: sourceChipBackground,
-                                    sourceTextColor: sourceChipText,
+                                SwipeRevealContainer(
                                     onRename: { onRenameMemo(memo.id) },
                                     onDelete: { onDeleteMemo(memo.id) }
-                                )
+                                ) {
+                                    MemoCard(
+                                        memo: memo,
+                                        background: cardBackground,
+                                        border: cardBorder,
+                                        titleColor: titleColor,
+                                        metaColor: metaColor,
+                                        sourceBackground: sourceChipBackground,
+                                        sourceTextColor: sourceChipText
+                                    )
+                                }
                             }
                         }
                     }
@@ -119,9 +132,11 @@ struct NotesScreen: View {
         mode: .loading,
         summaryText: "Loading local library",
         statusLabel: "Syncing",
+        searchQuery: "",
         filters: [],
         memos: [],
         onRecordClick: {},
+        onSearchQueryChange: { _ in },
         onSelectSourceFilter: { _ in },
         onRenameMemo: { _ in },
         onDeleteMemo: { _ in }
@@ -133,9 +148,11 @@ struct NotesScreen: View {
         mode: .loading,
         summaryText: "Loading local library",
         statusLabel: "Syncing",
+        searchQuery: "",
         filters: [],
         memos: [],
         onRecordClick: {},
+        onSearchQueryChange: { _ in },
         onSelectSourceFilter: { _ in },
         onRenameMemo: { _ in },
         onDeleteMemo: { _ in }
@@ -148,9 +165,11 @@ struct NotesScreen: View {
         mode: .empty,
         summaryText: "0 memos",
         statusLabel: "Synced",
+        searchQuery: "",
         filters: previewFilters(selected: "all"),
         memos: [],
         onRecordClick: {},
+        onSearchQueryChange: { _ in },
         onSelectSourceFilter: { _ in },
         onRenameMemo: { _ in },
         onDeleteMemo: { _ in }
@@ -162,9 +181,11 @@ struct NotesScreen: View {
         mode: .empty,
         summaryText: "0 memos",
         statusLabel: "Synced",
+        searchQuery: "",
         filters: previewFilters(selected: "all"),
         memos: [],
         onRecordClick: {},
+        onSearchQueryChange: { _ in },
         onSelectSourceFilter: { _ in },
         onRenameMemo: { _ in },
         onDeleteMemo: { _ in }
@@ -177,12 +198,14 @@ struct NotesScreen: View {
         mode: .loaded,
         summaryText: "12 memos · 18 min",
         statusLabel: "Synced",
+        searchQuery: "",
         filters: previewFilters(selected: "all"),
         memos: [
             MemoListItem(id: "memo-morning-idea", title: "Morning idea", time: "1:24", subtitle: "Today, 8:42", source: "Phone"),
             MemoListItem(id: "memo-pickup-notes", title: "Pickup notes", time: "0:48", subtitle: "Today, 12:10", source: "Watch")
         ],
         onRecordClick: {},
+        onSearchQueryChange: { _ in },
         onSelectSourceFilter: { _ in },
         onRenameMemo: { _ in },
         onDeleteMemo: { _ in }
@@ -194,12 +217,14 @@ struct NotesScreen: View {
         mode: .loaded,
         summaryText: "12 memos · 18 min",
         statusLabel: "Synced",
+        searchQuery: "",
         filters: previewFilters(selected: "all"),
         memos: [
             MemoListItem(id: "memo-morning-idea", title: "Morning idea", time: "1:24", subtitle: "Today, 8:42", source: "Phone"),
             MemoListItem(id: "memo-pickup-notes", title: "Pickup notes", time: "0:48", subtitle: "Today, 12:10", source: "Watch")
         ],
         onRecordClick: {},
+        onSearchQueryChange: { _ in },
         onSelectSourceFilter: { _ in },
         onRenameMemo: { _ in },
         onDeleteMemo: { _ in }
