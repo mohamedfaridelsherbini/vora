@@ -1,6 +1,16 @@
 import SwiftUI
 
 struct NotesRoute: View {
+    var body: some View {
+        if AppRuntime.isXcodePreview {
+            NotesPreviewRoute()
+        } else {
+            LiveNotesRoute()
+        }
+    }
+}
+
+private struct LiveNotesRoute: View {
     @State private var showSplash = true
     @StateObject private var notesViewModel = NotesViewModel()
 
@@ -81,5 +91,31 @@ struct NotesRoute: View {
                 .animation(.easeInOut, value: notesViewModel.deleteDialog != nil)
             }
         }
+    }
+}
+
+private struct NotesPreviewRoute: View {
+    var body: some View {
+        NotesScreen(
+            mode: .loaded,
+            summaryText: "3 memos",
+            statusLabel: "Synced",
+            searchQuery: "",
+            filters: [
+                NotesSourceFilterItem(key: "all", label: "All", count: 3, selected: true, iconName: nil),
+                NotesSourceFilterItem(key: "phone", label: "Phone", count: 2, selected: false, iconName: "iphone"),
+                NotesSourceFilterItem(key: "smart", label: "Smart", count: 1, selected: false, iconName: "sparkles")
+            ],
+            memos: [
+                MemoListItem(id: "preview-1", title: "Morning product notes", time: "09:42", subtitle: "Captured on iPhone", source: "Phone"),
+                MemoListItem(id: "preview-2", title: "Parking level reminder", time: "11:08", subtitle: "Smart summary ready", source: "Smart"),
+                MemoListItem(id: "preview-3", title: "Follow up with design", time: "14:31", subtitle: "Captured on iPhone", source: "Phone")
+            ],
+            onRecordClick: {},
+            onSearchQueryChange: { _ in },
+            onSelectSourceFilter: { _ in },
+            onRenameMemo: { _ in },
+            onDeleteMemo: { _ in }
+        )
     }
 }

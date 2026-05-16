@@ -6,6 +6,7 @@ import kotlinx.cinterop.ExperimentalForeignApi
 import platform.Foundation.NSDocumentDirectory
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSUserDomainMask
+import platform.Foundation.NSTemporaryDirectory
 
 @OptIn(ExperimentalForeignApi::class)
 fun getDatabaseBuilder(): RoomDatabase.Builder<VoraRoomDatabase> {
@@ -21,8 +22,8 @@ private fun documentDirectory(): String {
         directory = NSDocumentDirectory,
         inDomain = NSUserDomainMask,
         appropriateForURL = null,
-        create = false,
+        create = true,
         error = null,
     )
-    return requireNotNull(documentDirectory?.path)
+    return documentDirectory?.path ?: NSTemporaryDirectory()
 }

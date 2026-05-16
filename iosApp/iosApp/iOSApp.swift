@@ -4,7 +4,9 @@ import Shared
 @main
 struct iOSApp: App {
     init() {
-        KoinIosBootstrap().start()
+        if !AppRuntime.isXcodePreview {
+            KoinIosBootstrap().start()
+        }
     }
 
     var body: some Scene {
