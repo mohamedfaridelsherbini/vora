@@ -209,9 +209,9 @@ struct NotesScreen: View {
 
 private func previewFilters(selected: String) -> [NotesSourceFilterItem] {
     [
-        NotesSourceFilterItem(key: "all", label: "All", count: 12, selected: selected == "all"),
-        NotesSourceFilterItem(key: "phone", label: "Phone", count: 7, selected: selected == "phone"),
-        NotesSourceFilterItem(key: "smart", label: "Smart", count: 3, selected: selected == "smart"),
-        NotesSourceFilterItem(key: "car", label: "Car", count: 2, selected: selected == "car")
+        NotesSourceFilterItem(key: "all",   label: "All",   count: 12, selected: selected == "all",   iconName: nil),
+        NotesSourceFilterItem(key: "phone", label: "Phone", count: 7,  selected: selected == "phone", iconName: "iphone"),
+        NotesSourceFilterItem(key: "smart", label: "Smart", count: 3,  selected: selected == "smart", iconName: "sparkles"),
+        NotesSourceFilterItem(key: "car",   label: "Car",   count: 2,  selected: selected == "car",   iconName: "car.fill"),
     ]
 }

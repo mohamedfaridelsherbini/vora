@@ -32,12 +32,12 @@ class NotesFeatureService(
         )
     }
 
-    suspend fun renameMemo(id: String) {
-        val current = voiceMemoUseCases.observeVoiceMemos().first()
-        val memo = current.firstOrNull { it.id == id } ?: return
+    suspend fun renameMemo(id: String, newTitle: String) {
+        val trimmed = newTitle.trim()
+        if (trimmed.isBlank()) return
         voiceMemoUseCases.renameVoiceMemo(
             id = id,
-            title = memo.title.toRenamedTitle(),
+            title = trimmed,
         )
     }
 

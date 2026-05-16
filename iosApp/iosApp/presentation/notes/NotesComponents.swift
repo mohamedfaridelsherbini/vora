@@ -269,20 +269,7 @@ private extension String {
     }
 }
 
-private extension NotesSourceFilterItem {
-    var iconName: String? {
-        switch key {
-        case "phone":
-            return "iphone"
-        case "smart":
-            return "applewatch"
-        case "car":
-            return "car.fill"
-        default:
-            return nil
-        }
-    }
-}
+
 
 struct MemoCard: View {
     let memo: MemoListItem
@@ -383,6 +370,75 @@ private struct MemoAction: View {
             .foregroundStyle(tint)
         }
         .buttonStyle(.plain)
+    }
+}
+
+struct VoraRenameSheet: View {
+    let currentTitle: String
+    let onSave: (String) -> Void
+    let onCancel: () -> Void
+
+    @State private var text: String = ""
+    @FocusState private var focused: Bool
+
+    private var trimmed: String { text.trimmingCharacters(in: .whitespaces) }
+    private var canSave: Bool { !trimmed.isEmpty && trimmed != currentTitle.trimmingCharacters(in: .whitespaces) }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 20) {
+            Text("Rename memo")
+                .font(.voraTitle)
+                .foregroundStyle(Color.voraLogoInk)
+                .padding(.top, 4)
+
+            TextField("Memo title", text: $text)
+                .font(.voraBody)
+                .foregroundStyle(Color.voraLogoInk)
+                .focused($focused)
+                .submitLabel(.done)
+                .onSubmit { if canSave { onSave(trimmed) } }
+                .padding(.horizontal, 14)
+                .padding(.vertical, 12)
+                .background(Color(hex: 0xF5F7FA))
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(focused ? Color.voraLogoInk : Color(hex: 0xE7EDF3), lineWidth: 1)
+                )
+
+            HStack(spacing: 12) {
+                Button(action: onCancel) {
+                    Text("Cancel")
+                        .font(.voraBody)
+                        .foregroundStyle(Color.voraMuted)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                        .background(Color(hex: 0xEFF4F7))
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                }
+                .buttonStyle(.plain)
+
+                Button {
+                    onSave(trimmed)
+                } label: {
+                    Text("Save")
+                        .font(.voraLabelLarge)
+                        .foregroundStyle(canSave ? .voraWhite : Color.voraMuted)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                        .background(canSave ? Color.voraLogoInk : Color(hex: 0xE0E5EA))
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                }
+                .buttonStyle(.plain)
+                .disabled(!canSave)
+            }
+        }
+        .padding(.horizontal, 24)
+        .padding(.vertical, 20)
+        .onAppear {
+            text = currentTitle
+            focused = true
+        }
     }
 }
 

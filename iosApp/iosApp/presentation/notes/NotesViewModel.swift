@@ -8,6 +8,8 @@ final class NotesViewModel: ObservableObject {
     @Published var statusLabel: String = "Syncing"
     @Published var filters: [NotesSourceFilterItem] = []
     @Published var memos: [MemoListItem] = []
+    @Published var renameDialog: RenameDialogState? = nil
+    @Published var deleteDialog: DeleteDialogState? = nil
 
     private let bridge = IosNotesBridge()
 
@@ -27,15 +29,43 @@ final class NotesViewModel: ObservableObject {
         await load()
     }
 
-    func renameMemo(id: String) async {
-        _ = try? await bridge.renameMemo(id: id)
+    // ── Rename ──────────────────────────────────────────────────────────────
+
+    func requestRename(id: String) {
+        guard let memo = memos.first(where: { $0.id == id }) else { return }
+        renameDialog = RenameDialogState(memoId: id, currentTitle: memo.title)
+    }
+
+    func confirmRename(newTitle: String) async {
+        guard let dialog = renameDialog else { return }
+        renameDialog = nil
+        _ = try? await bridge.renameMemo(id: dialog.memoId, newTitle: newTitle)
         await load()
     }
 
-    func deleteMemo(id: String) async {
-        _ = try? await bridge.deleteMemo(id: id)
+    func dismissRename() {
+        renameDialog = nil
+    }
+
+    // ── Delete ──────────────────────────────────────────────────────────────
+
+    func requestDelete(id: String) {
+        guard let memo = memos.first(where: { $0.id == id }) else { return }
+        deleteDialog = DeleteDialogState(memoId: id, memoTitle: memo.title)
+    }
+
+    func confirmDelete() async {
+        guard let dialog = deleteDialog else { return }
+        deleteDialog = nil
+        _ = try? await bridge.deleteMemo(id: dialog.memoId)
         await load()
     }
+
+    func dismissDelete() {
+        deleteDialog = nil
+    }
+
+    // ── Filter ──────────────────────────────────────────────────────────────
 
     func selectSourceFilter(key: String) async {
         bridge.selectSourceFilter(key: key)
@@ -51,7 +81,8 @@ final class NotesViewModel: ObservableObject {
                 key: filter.key,
                 label: filter.label,
                 count: Int(filter.count),
-                selected: filter.selected
+                selected: filter.selected,
+                iconName: iconName(for: filter.key)
             )
         }
         memos = snapshot.memos.map { memo in
@@ -76,5 +107,15 @@ private extension NotesSnapshotMode {
         default:
             return .loaded
         }
+    }
+}
+
+private func iconName(for key: String) -> String? {
+    switch key {
+    case "phone": return "iphone"
+    case "watch": return "applewatch"
+    case "car":   return "car.fill"
+    case "smart": return "sparkles"
+    default:      return nil
     }
 }

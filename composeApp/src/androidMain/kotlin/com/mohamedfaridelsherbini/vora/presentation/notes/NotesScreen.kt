@@ -21,8 +21,12 @@ internal fun NotesScreen(state: NotesListVisualState) {
         state = state,
         onRecordClick = {},
         onSelectSourceFilter = {},
-        onRenameMemo = {},
-        onDeleteMemo = {},
+        onRenameRequest = {},
+        onDeleteRequest = {},
+        onRenameConfirm = {},
+        onDeleteConfirm = {},
+        onDismissRename = {},
+        onDismissDelete = {},
     )
 }
 
@@ -31,8 +35,12 @@ internal fun NotesScreen(
     state: NotesListVisualState,
     onRecordClick: () -> Unit,
     onSelectSourceFilter: (String) -> Unit,
-    onRenameMemo: (String) -> Unit,
-    onDeleteMemo: (String) -> Unit,
+    onRenameRequest: (String) -> Unit,
+    onDeleteRequest: (String) -> Unit,
+    onRenameConfirm: (String) -> Unit,
+    onDeleteConfirm: () -> Unit,
+    onDismissRename: () -> Unit,
+    onDismissDelete: () -> Unit,
 ) {
     Box(
         modifier = Modifier
@@ -44,8 +52,8 @@ internal fun NotesScreen(
             modifier = Modifier.fillMaxSize(),
             state = state,
             onSelectSourceFilter = onSelectSourceFilter,
-            onRenameMemo = onRenameMemo,
-            onDeleteMemo = onDeleteMemo,
+            onRenameRequest = onRenameRequest,
+            onDeleteRequest = onDeleteRequest,
         )
 
         RecordFab(
@@ -57,6 +65,22 @@ internal fun NotesScreen(
             onClick = onRecordClick,
         )
     }
+
+    state.renameDialog?.let { dialog ->
+        VoraRenameDialog(
+            currentTitle = dialog.currentTitle,
+            onConfirm = onRenameConfirm,
+            onDismiss = onDismissRename,
+        )
+    }
+
+    state.deleteDialog?.let { dialog ->
+        VoraDeleteDialog(
+            memoTitle = dialog.memoTitle,
+            onConfirm = onDeleteConfirm,
+            onDismiss = onDismissDelete,
+        )
+    }
 }
 
 @Composable
@@ -64,8 +88,8 @@ private fun NotesListContent(
     modifier: Modifier = Modifier,
     state: NotesListVisualState,
     onSelectSourceFilter: (String) -> Unit,
-    onRenameMemo: (String) -> Unit,
-    onDeleteMemo: (String) -> Unit,
+    onRenameRequest: (String) -> Unit,
+    onDeleteRequest: (String) -> Unit,
 ) {
     LazyColumn(
         modifier = modifier,
@@ -98,8 +122,8 @@ private fun NotesListContent(
             NotesListMode.Loaded -> loadedContent(
                 state = state,
                 onSelectSourceFilter = onSelectSourceFilter,
-                onRenameMemo = onRenameMemo,
-                onDeleteMemo = onDeleteMemo,
+                onRenameRequest = onRenameRequest,
+                onDeleteRequest = onDeleteRequest,
             )
         }
     }
@@ -153,8 +177,8 @@ private fun androidx.compose.foundation.lazy.LazyListScope.emptyContent(
 private fun androidx.compose.foundation.lazy.LazyListScope.loadedContent(
     state: NotesListVisualState,
     onSelectSourceFilter: (String) -> Unit,
-    onRenameMemo: (String) -> Unit,
-    onDeleteMemo: (String) -> Unit,
+    onRenameRequest: (String) -> Unit,
+    onDeleteRequest: (String) -> Unit,
 ) {
     item {
         NotesFilterRow(
@@ -181,8 +205,8 @@ private fun androidx.compose.foundation.lazy.LazyListScope.loadedContent(
             cardBorder = state.cardBorder,
             sourceBackground = state.filterChipBackground,
             sourceTextColor = state.filterChipTextColor,
-            onRename = { onRenameMemo(memo.id) },
-            onDelete = { onDeleteMemo(memo.id) },
+            onRename = { onRenameRequest(memo.id) },
+            onDelete = { onDeleteRequest(memo.id) },
         )
     }
 }

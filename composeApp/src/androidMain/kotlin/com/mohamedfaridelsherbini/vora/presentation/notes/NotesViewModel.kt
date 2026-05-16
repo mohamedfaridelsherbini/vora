@@ -9,6 +9,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 internal class NotesViewModel(
@@ -28,19 +29,47 @@ internal class NotesViewModel(
         }
     }
 
-    fun renameMemo(id: String) {
+    // ── Rename ──────────────────────────────────────────────────────────────
+
+    fun requestRename(id: String) {
+        val memo = _uiState.value.memos.firstOrNull { it.id == id } ?: return
+        _uiState.update { it.copy(renameDialog = RenameDialogState(memoId = id, currentTitle = memo.title)) }
+    }
+
+    fun confirmRename(newTitle: String) {
+        val id = _uiState.value.renameDialog?.memoId ?: return
+        _uiState.update { it.copy(renameDialog = null) }
         viewModelScope.launch {
-            notesFeatureService.renameMemo(id)
+            notesFeatureService.renameMemo(id = id, newTitle = newTitle)
             refreshNotes()
         }
     }
 
-    fun deleteMemo(id: String) {
+    fun dismissRename() {
+        _uiState.update { it.copy(renameDialog = null) }
+    }
+
+    // ── Delete ──────────────────────────────────────────────────────────────
+
+    fun requestDelete(id: String) {
+        val memo = _uiState.value.memos.firstOrNull { it.id == id } ?: return
+        _uiState.update { it.copy(deleteDialog = DeleteDialogState(memoId = id, memoTitle = memo.title)) }
+    }
+
+    fun confirmDelete() {
+        val id = _uiState.value.deleteDialog?.memoId ?: return
+        _uiState.update { it.copy(deleteDialog = null) }
         viewModelScope.launch {
             notesFeatureService.deleteMemo(id)
             refreshNotes()
         }
     }
+
+    fun dismissDelete() {
+        _uiState.update { it.copy(deleteDialog = null) }
+    }
+
+    // ── Filter ──────────────────────────────────────────────────────────────
 
     fun selectSourceFilter(key: String) {
         notesFeatureService.selectSourceFilter(key)
@@ -56,6 +85,7 @@ internal class NotesViewModel(
         }
     }
 }
+
 
 internal class NotesViewModelFactory(
     private val notesFeatureService: NotesFeatureService,

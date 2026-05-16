@@ -23,10 +23,10 @@ struct NotesRoute: View {
                         Task { await notesViewModel.selectSourceFilter(key: key) }
                     },
                     onRenameMemo: { id in
-                        Task { await notesViewModel.renameMemo(id: id) }
+                        notesViewModel.requestRename(id: id)
                     },
                     onDeleteMemo: { id in
-                        Task { await notesViewModel.deleteMemo(id: id) }
+                        notesViewModel.requestDelete(id: id)
                     }
                 )
                 .transition(.opacity)
@@ -39,5 +39,43 @@ struct NotesRoute: View {
             }
             await notesViewModel.load()
         }
+        // ── Rename sheet ────────────────────────────────────────────────────
+        .sheet(item: $notesViewModel.renameDialog) { dialog in
+            VoraRenameSheet(
+                currentTitle: dialog.currentTitle,
+                onSave: { newTitle in
+                    Task { await notesViewModel.confirmRename(newTitle: newTitle) }
+                },
+                onCancel: {
+                    notesViewModel.dismissRename()
+                }
+            )
+            .presentationDetents([.height(240)])
+            .presentationDragIndicator(.visible)
+        }
+        // ── Delete confirmation ─────────────────────────────────────────────
+        .confirmationDialog(
+            deleteDialogTitle,
+            isPresented: Binding(
+                get: { notesViewModel.deleteDialog != nil },
+                set: { if !$0 { notesViewModel.dismissDelete() } }
+            ),
+            titleVisibility: .visible
+        ) {
+            Button("Delete", role: .destructive) {
+                Task { await notesViewModel.confirmDelete() }
+            }
+            Button("Cancel", role: .cancel) {
+                notesViewModel.dismissDelete()
+            }
+        } message: {
+            if let title = notesViewModel.deleteDialog?.memoTitle {
+                Text("\u{201C}\(title)\u{201D} will be permanently deleted and cannot be recovered.")
+            }
+        }
+    }
+
+    private var deleteDialogTitle: String {
+        notesViewModel.deleteDialog.map { "Delete \"\($0.memoTitle)\"?" } ?? "Delete memo?"
     }
 }

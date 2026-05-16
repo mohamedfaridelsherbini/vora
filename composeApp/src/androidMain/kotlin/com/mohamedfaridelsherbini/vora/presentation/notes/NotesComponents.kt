@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.HelpOutline
 import androidx.compose.material.icons.outlined.CheckCircle
@@ -26,20 +28,167 @@ import androidx.compose.material.icons.outlined.PriorityHigh
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Sync
 import androidx.compose.material.icons.outlined.Watch
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mohamedfaridelsherbini.vora.presentation.theme.VoraColors
 import com.mohamedfaridelsherbini.vora.presentation.theme.VoraSpacing
 import com.mohamedfaridelsherbini.vora.presentation.theme.interFontFamily
+
+// ── Dialogs ──────────────────────────────────────────────────────────────────
+
+@Composable
+internal fun VoraRenameDialog(
+    currentTitle: String,
+    onConfirm: (String) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val focusRequester = remember { FocusRequester() }
+    var fieldValue by remember {
+        mutableStateOf(
+            TextFieldValue(
+                text = currentTitle,
+                selection = TextRange(0, currentTitle.length),
+            ),
+        )
+    }
+    val trimmed = fieldValue.text.trim()
+    val canSave = trimmed.isNotBlank() && trimmed != currentTitle.trim()
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = "Rename memo",
+                fontFamily = interFontFamily(),
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp,
+            )
+        },
+        text = {
+            OutlinedTextField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .focusRequester(focusRequester),
+                value = fieldValue,
+                onValueChange = { fieldValue = it },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                keyboardActions = KeyboardActions(
+                    onDone = { if (canSave) onConfirm(trimmed) },
+                ),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = VoraColors.LogoInk,
+                    unfocusedBorderColor = VoraColors.VoraMuted.copy(alpha = 0.4f),
+                ),
+                textStyle = androidx.compose.ui.text.TextStyle(
+                    fontFamily = interFontFamily(),
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 15.sp,
+                ),
+            )
+        },
+        confirmButton = {
+            TextButton(
+                onClick = { onConfirm(trimmed) },
+                enabled = canSave,
+            ) {
+                Text(
+                    text = "Save",
+                    fontFamily = interFontFamily(),
+                    fontWeight = FontWeight.SemiBold,
+                    color = if (canSave) VoraColors.LogoInk else VoraColors.VoraMuted.copy(alpha = 0.5f),
+                )
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(
+                    text = "Cancel",
+                    fontFamily = interFontFamily(),
+                    fontWeight = FontWeight.Medium,
+                    color = VoraColors.VoraMuted,
+                )
+            }
+        },
+    )
+
+    LaunchedEffect(Unit) { focusRequester.requestFocus() }
+}
+
+@Composable
+internal fun VoraDeleteDialog(
+    memoTitle: String,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = "Delete memo?",
+                fontFamily = interFontFamily(),
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp,
+            )
+        },
+        text = {
+            Text(
+                text = "\u201c$memoTitle\u201d will be permanently deleted and cannot be recovered.",
+                fontFamily = interFontFamily(),
+                fontWeight = FontWeight.Medium,
+                fontSize = 14.sp,
+            )
+        },
+        confirmButton = {
+            TextButton(
+                onClick = onConfirm,
+                colors = ButtonDefaults.textButtonColors(contentColor = VoraColors.Danger),
+            ) {
+                Text(
+                    text = "Delete",
+                    fontFamily = interFontFamily(),
+                    fontWeight = FontWeight.SemiBold,
+                )
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(
+                    text = "Cancel",
+                    fontFamily = interFontFamily(),
+                    fontWeight = FontWeight.Medium,
+                    color = VoraColors.VoraMuted,
+                )
+            }
+        },
+    )
+}
+
+// ── List components ───────────────────────────────────────────────────────────
 
 @Composable
 internal fun NotesHeader(

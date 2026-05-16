@@ -12,8 +12,8 @@ class IosNotesBridge {
         notesFeatureService.insertMemo()
     }
 
-    suspend fun renameMemo(id: String) {
-        notesFeatureService.renameMemo(id)
+    suspend fun renameMemo(id: String, newTitle: String) {
+        notesFeatureService.renameMemo(id = id, newTitle = newTitle)
     }
 
     suspend fun deleteMemo(id: String) {

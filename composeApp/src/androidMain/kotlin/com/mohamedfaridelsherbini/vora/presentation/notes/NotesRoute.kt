@@ -22,7 +22,12 @@ internal fun NotesRoute() {
         state = notesListVisualState(uiState),
         onRecordClick = notesViewModel::insertMemo,
         onSelectSourceFilter = notesViewModel::selectSourceFilter,
-        onRenameMemo = notesViewModel::renameMemo,
-        onDeleteMemo = notesViewModel::deleteMemo,
+        onRenameRequest = notesViewModel::requestRename,
+        onDeleteRequest = notesViewModel::requestDelete,
+        onRenameConfirm = notesViewModel::confirmRename,
+        onDeleteConfirm = notesViewModel::confirmDelete,
+        onDismissRename = notesViewModel::dismissRename,
+        onDismissDelete = notesViewModel::dismissDelete,
     )
 }
+

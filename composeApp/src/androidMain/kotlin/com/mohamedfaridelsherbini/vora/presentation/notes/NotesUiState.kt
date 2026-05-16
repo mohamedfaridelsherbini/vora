@@ -26,12 +26,24 @@ internal enum class NotesListMode {
     Loaded,
 }
 
+internal data class RenameDialogState(
+    val memoId: String,
+    val currentTitle: String,
+)
+
+internal data class DeleteDialogState(
+    val memoId: String,
+    val memoTitle: String,
+)
+
 internal data class NotesUiState(
     val mode: NotesListMode,
     val summaryText: String,
     val statusLabel: String,
     val filters: List<NotesSourceFilterUi>,
     val memos: List<NoteListItemUi>,
+    val renameDialog: RenameDialogState? = null,
+    val deleteDialog: DeleteDialogState? = null,
 )
 
 internal data class NotesListVisualState(
@@ -57,6 +69,8 @@ internal data class NotesListVisualState(
     val recordButtonTextColor: Color,
     val filters: List<NotesSourceFilterUi>,
     val memos: List<NoteListItemUi>,
+    val renameDialog: RenameDialogState? = null,
+    val deleteDialog: DeleteDialogState? = null,
 )
 
 internal fun NotesUiState.toVisualState(dark: Boolean): NotesListVisualState = NotesListVisualState(
@@ -90,6 +104,8 @@ internal fun NotesUiState.toVisualState(dark: Boolean): NotesListVisualState = N
     recordButtonTextColor = VoraColors.VoraWhite,
     filters = filters,
     memos = memos,
+    renameDialog = renameDialog,
+    deleteDialog = deleteDialog,
 )
 
 @Composable
