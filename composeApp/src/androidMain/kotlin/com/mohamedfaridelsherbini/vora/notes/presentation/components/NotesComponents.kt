@@ -1,4 +1,4 @@
-package com.mohamedfaridelsherbini.vora.presentation.notes
+package com.mohamedfaridelsherbini.vora.notes.presentation.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -82,6 +82,8 @@ import kotlin.math.roundToInt
 import com.mohamedfaridelsherbini.vora.presentation.theme.VoraColors
 import com.mohamedfaridelsherbini.vora.presentation.theme.VoraSpacing
 import com.mohamedfaridelsherbini.vora.presentation.theme.interFontFamily
+import com.mohamedfaridelsherbini.vora.notes.presentation.state.NoteListItemUi
+import com.mohamedfaridelsherbini.vora.notes.presentation.state.NotesSourceFilterUi
 
 // ── Dialogs ──────────────────────────────────────────────────────────────────
 

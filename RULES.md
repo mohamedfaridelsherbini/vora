@@ -105,6 +105,8 @@ Do not:
 
 ## Unified UI Architecture Rules
 
+- The following feature structure is the primary and enforced architecture for the entire project.
+- This structure is the single source of truth for feature organization.
 - Use one mental model across Compose, SwiftUI, and KMP presentation boundaries.
 - Organize by feature, not by widget type or framework convenience.
 - UI rendering is stateless by default.
@@ -119,13 +121,53 @@ feature/
   presentation/
     screen/
     components/
-    preview/
     state/
     action/
     viewmodel/
     navigation/
   domain/
   data/
+```
+
+Folder responsibilities:
+
+- `presentation/` contains all UI and presentation-layer logic.
+- `presentation/screen/` contains Route/View entry points, screen orchestration, stateless screen rendering, and screen previews.
+- `presentation/components/` contains reusable UI components, medium/large composables/views, shared feature UI blocks, and independently previewable component previews.
+- `presentation/state/` contains immutable UI state models, screen state definitions, and view rendering state.
+- `presentation/action/` contains user actions, UI events, intent definitions, and screen interaction contracts.
+- `presentation/viewmodel/` contains ViewModels, presentation logic, state orchestration, and action handling.
+- `presentation/navigation/` contains navigation routes, navigation graphs, deep links, and navigation coordinators.
+- `domain/` contains business logic, use cases, domain models, repository contracts/interfaces, and pure business rules.
+- `data/` contains repository implementations, API services, DTOs, local database code, data sources, mappers, and cache implementations.
+
+Enforcement:
+
+- Always generate features using the primary structure before implementation begins.
+- Never flatten feature folders.
+- Never mix presentation, domain, and data responsibilities.
+- Never place ViewModels outside `presentation/viewmodel/`.
+- Never place reusable UI outside `presentation/components/`.
+- Never place use cases inside `presentation/`.
+- Never place repositories directly inside screens/views.
+- Keep state models inside `presentation/state/`.
+- Keep actions/events inside `presentation/action/`.
+- Keep navigation isolated inside `presentation/navigation/`.
+
+Forbidden feature structures:
+
+```text
+feature/
+  ui/
+  vm/
+  utils/
+```
+
+```text
+feature/
+  screen/
+  repository/
+  api/
 ```
 
 ## Compose Rules
@@ -411,15 +453,13 @@ Do not:
 
 ## Test File Structure Guidelines
 
+Tests must mirror the primary feature structure inside the platform test source root. Test folders do not replace or flatten the runtime feature architecture.
+
 Compose:
 
 ```text
-feature/notes/
-  presentation/
-    viewmodel/
-    screen/
-    components/
-  test/
+test/
+  feature/notes/
     unit/
     ui/
     snapshot/
@@ -428,9 +468,8 @@ feature/notes/
 SwiftUI:
 
 ```text
-Features/Notes/
-  Presentation/
-  Tests/
+Tests/
+  Features/Notes/
     Unit/
     UI/
     Snapshot/

@@ -1,7 +1,7 @@
 package com.mohamedfaridelsherbini.vora
 
 import androidx.compose.runtime.Composable
-import com.mohamedfaridelsherbini.vora.presentation.notes.NotesRoute
+import com.mohamedfaridelsherbini.vora.notes.presentation.navigation.NotesRoute
 import com.mohamedfaridelsherbini.vora.presentation.splash.VoraSplashScreen
 
 @Composable

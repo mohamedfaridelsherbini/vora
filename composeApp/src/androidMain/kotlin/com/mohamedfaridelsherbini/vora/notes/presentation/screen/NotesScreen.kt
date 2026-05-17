@@ -1,4 +1,4 @@
-package com.mohamedfaridelsherbini.vora.presentation.notes
+package com.mohamedfaridelsherbini.vora.notes.presentation.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -13,6 +13,25 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.mohamedfaridelsherbini.vora.notes.presentation.components.LoadingMemoCard
+import com.mohamedfaridelsherbini.vora.notes.presentation.components.MemoCard
+import com.mohamedfaridelsherbini.vora.notes.presentation.components.NotesEmptyStateCard
+import com.mohamedfaridelsherbini.vora.notes.presentation.components.NotesFilterRow
+import com.mohamedfaridelsherbini.vora.notes.presentation.components.NotesHeader
+import com.mohamedfaridelsherbini.vora.notes.presentation.components.NotesLoadingFilterRow
+import com.mohamedfaridelsherbini.vora.notes.presentation.components.NotesLoadingStatusCard
+import com.mohamedfaridelsherbini.vora.notes.presentation.components.NotesRecentLabel
+import com.mohamedfaridelsherbini.vora.notes.presentation.components.NotesSearchBar
+import com.mohamedfaridelsherbini.vora.notes.presentation.components.RecordFab
+import com.mohamedfaridelsherbini.vora.notes.presentation.components.SwipeRevealItem
+import com.mohamedfaridelsherbini.vora.notes.presentation.components.VoraDeleteDialog
+import com.mohamedfaridelsherbini.vora.notes.presentation.components.VoraRenameBottomSheet
+import com.mohamedfaridelsherbini.vora.notes.presentation.state.NotesListMode
+import com.mohamedfaridelsherbini.vora.notes.presentation.state.NotesListVisualState
+import com.mohamedfaridelsherbini.vora.notes.presentation.state.previewEmptyNotesUiState
+import com.mohamedfaridelsherbini.vora.notes.presentation.state.previewLoadedNotesUiState
+import com.mohamedfaridelsherbini.vora.notes.presentation.state.previewLoadingNotesUiState
+import com.mohamedfaridelsherbini.vora.notes.presentation.state.toVisualState
 import com.mohamedfaridelsherbini.vora.presentation.theme.VoraSpacing
 
 @Composable

@@ -1,4 +1,4 @@
-package com.mohamedfaridelsherbini.vora.presentation.notes
+package com.mohamedfaridelsherbini.vora.notes.presentation.state
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable

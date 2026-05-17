@@ -80,14 +80,13 @@ All platform UI must use the same responsibility split. Do not keep routing, sta
 
 ### Unified feature architecture
 
-Every feature should follow this architecture:
+The following feature structure is the primary and enforced architecture for the entire project. It is the single source of truth for all generated features, modules, screens, tests, previews, and implementations.
 
 ```text
 feature/
   presentation/
     screen/
     components/
-    preview/
     state/
     action/
     viewmodel/
@@ -97,6 +96,31 @@ feature/
 ```
 
 This same mental model must be mirrored across Compose and SwiftUI even when syntax differs.
+
+Folder responsibilities:
+
+- `presentation/` contains all UI and presentation-layer logic.
+- `presentation/screen/` contains Route/View entry points, screen orchestration, stateless screen rendering, and screen previews.
+- `presentation/components/` contains reusable UI components, medium/large composables/views, shared feature UI blocks, and independently previewable component previews.
+- `presentation/state/` contains immutable UI state models, screen state definitions, and view rendering state.
+- `presentation/action/` contains user actions, UI events, intent definitions, and screen interaction contracts.
+- `presentation/viewmodel/` contains ViewModels, presentation logic, state orchestration, and action handling.
+- `presentation/navigation/` contains navigation routes, navigation graphs, deep links, and navigation coordinators.
+- `domain/` contains business logic, use cases, domain models, repository contracts/interfaces, and pure business rules.
+- `data/` contains repository implementations, API services, DTOs, local database code, data sources, mappers, and cache implementations.
+
+Enforcement:
+
+- Always generate features using this structure before implementation begins.
+- Never flatten feature folders.
+- Never mix presentation, domain, and data responsibilities.
+- Never place ViewModels outside `presentation/viewmodel/`.
+- Never place reusable UI outside `presentation/components/`.
+- Never place use cases inside `presentation/`.
+- Never place repositories directly inside screens/views.
+- Keep state models inside `presentation/state/`.
+- Keep actions/events inside `presentation/action/`.
+- Keep navigation isolated inside `presentation/navigation/`.
 
 ### Required screen split
 
@@ -111,26 +135,11 @@ This same mental model must be mirrored across Compose and SwiftUI even when syn
 
 ### Feature-first UI folders
 
-- Android mobile: `composeApp/src/androidMain/kotlin/.../presentation/<feature>/`
-- iPhone: `iosApp/iosApp/presentation/<feature>/`
-- Wear OS: `wearApp/src/main/java/.../presentation/<feature>/`
-- Apple Watch: `iosApp/VoraWatch Watch App/presentation/<feature>/`
-- Car: `carApp/src/main/java/.../presentation/<feature>/`
-
-### Current expected structure
-
-- Android mobile:
-  - `presentation/splash/`
-  - `presentation/notes/`
-- iPhone:
-  - `presentation/splash/`
-  - `presentation/notes/`
-- Wear OS:
-  - `presentation/capture/`
-- Apple Watch:
-  - `presentation/capture/`
-- Car:
-  - `presentation/home/`
+- Android mobile: `composeApp/src/androidMain/kotlin/.../<feature>/presentation/`
+- iPhone: `iosApp/iosApp/<feature>/presentation/`
+- Wear OS: `wearApp/src/main/java/.../<feature>/presentation/`
+- Apple Watch: `iosApp/VoraWatch Watch App/<feature>/presentation/`
+- Car: `carApp/src/main/java/.../<feature>/presentation/`
 
 ### UI file rules
 
@@ -155,6 +164,14 @@ This same mental model must be mirrored across Compose and SwiftUI even when syn
 
 ### Forbidden UI architecture patterns
 
+- Flattened feature folders such as:
+  - `feature/ui/`
+  - `feature/vm/`
+  - `feature/utils/`
+- Mixed responsibility folders such as:
+  - `feature/screen/`
+  - `feature/repository/`
+  - `feature/api/`
 - Massive screen/view files (especially 500+ lines without decomposition)
 - Business logic inside composables or SwiftUI views
 - Repository/data-source usage inside UI rendering layers
@@ -432,7 +449,7 @@ Deliver production Android behavior for handheld capture, playback, storage, and
 - Are main-thread blocking calls avoided?
 - Are repositories, use cases, and services injected instead of manually created in UI or activities?
 - Is the route/container/content split clear where the screen is non-trivial?
-- Does the feature follow `presentation/<feature>/Route + UiState + Screen + Components` instead of a single large page file?
+- Does the feature follow `feature/presentation/{screen,components,state,action,viewmodel,navigation}` instead of a flattened or mixed folder?
 - Does each composable have one rendering responsibility?
 - Are child composable parameters narrow and role-specific instead of whole-screen objects by default?
 - Can design-system or leaf components be previewed without constructing app dependencies?

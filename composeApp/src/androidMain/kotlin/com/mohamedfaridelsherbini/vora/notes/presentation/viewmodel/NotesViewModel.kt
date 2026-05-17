@@ -1,10 +1,18 @@
-package com.mohamedfaridelsherbini.vora.presentation.notes
+package com.mohamedfaridelsherbini.vora.notes.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.mohamedfaridelsherbini.vora.notes.NotesFeatureService
 import com.mohamedfaridelsherbini.vora.notes.NotesSnapshot
+import com.mohamedfaridelsherbini.vora.notes.presentation.action.NotesAction
+import com.mohamedfaridelsherbini.vora.notes.presentation.state.DeleteDialogState
+import com.mohamedfaridelsherbini.vora.notes.presentation.state.NoteListItemUi
+import com.mohamedfaridelsherbini.vora.notes.presentation.state.NotesListMode
+import com.mohamedfaridelsherbini.vora.notes.presentation.state.NotesSourceFilterUi
+import com.mohamedfaridelsherbini.vora.notes.presentation.state.NotesUiState
+import com.mohamedfaridelsherbini.vora.notes.presentation.state.RenameDialogState
+import com.mohamedfaridelsherbini.vora.notes.presentation.state.previewLoadingNotesUiState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,6 +28,20 @@ internal class NotesViewModel(
 
     init {
         refreshNotes(withDelay = true)
+    }
+
+    fun onAction(action: NotesAction) {
+        when (action) {
+            NotesAction.RecordMemo -> insertMemo()
+            is NotesAction.Search -> onSearchQueryChange(action.query)
+            is NotesAction.SelectSourceFilter -> selectSourceFilter(action.key)
+            is NotesAction.RequestRename -> requestRename(action.id)
+            is NotesAction.RequestDelete -> requestDelete(action.id)
+            is NotesAction.ConfirmRename -> confirmRename(action.newTitle)
+            NotesAction.ConfirmDelete -> confirmDelete()
+            NotesAction.DismissRename -> dismissRename()
+            NotesAction.DismissDelete -> dismissDelete()
+        }
     }
 
     fun insertMemo() {
