@@ -116,6 +116,8 @@ All platform UI must use the same responsibility split. Do not keep routing, sta
 
 - Entry files may host platform bootstrapping only. They must not contain full page UI trees.
 - Route files may orchestrate timing, navigation, and state selection. They must not become rendering-heavy.
+- One screen file should contain the screen structure only.
+- Reusable or complex UI parts should be split into separate files.
 - Screen files compose sections and own page-level layout only.
 - Components files own headers, cards, chips, search bars, buttons, and other reusable feature UI parts.
 - UI state files own immutable screen contracts. Do not bury state types inside unrelated files.
