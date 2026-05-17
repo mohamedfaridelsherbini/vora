@@ -27,21 +27,11 @@ private struct LiveNotesRoute: View {
                     searchQuery: notesViewModel.searchQuery,
                     filters: notesViewModel.filters,
                     memos: notesViewModel.memos,
-                    onRecordClick: {
-                        Task { await notesViewModel.insertMemo() }
-                    },
-                    onSearchQueryChange: { query in
-                        Task { await notesViewModel.updateSearchQuery(query) }
-                    },
-                    onSelectSourceFilter: { key in
-                        Task { await notesViewModel.selectSourceFilter(key: key) }
-                    },
-                    onRenameMemo: { id in
-                        notesViewModel.requestRename(id: id)
-                    },
-                    onDeleteMemo: { id in
-                        notesViewModel.requestDelete(id: id)
-                    }
+                    onRecordClick: { notesViewModel.onAction(.insertMemo) },
+                    onSearchQueryChange: { query in notesViewModel.onAction(.updateSearchQuery(query)) },
+                    onSelectSourceFilter: { key in notesViewModel.onAction(.selectSourceFilter(key)) },
+                    onRenameMemo: { id in notesViewModel.onAction(.requestRename(id)) },
+                    onDeleteMemo: { id in notesViewModel.onAction(.requestDelete(id)) }
                 )
                 .transition(.opacity)
             }
@@ -51,17 +41,17 @@ private struct LiveNotesRoute: View {
             withAnimation(.easeInOut(duration: 0.2)) {
                 showSplash = false
             }
-            await notesViewModel.load()
+            notesViewModel.onAction(.load)
         }
         // ── Rename sheet ────────────────────────────────────────────────────
         .sheet(item: $notesViewModel.renameDialog) { dialog in
             VoraRenameSheet(
                 memo: dialog.memo,
                 onSave: { newTitle in
-                    Task { await notesViewModel.confirmRename(newTitle: newTitle) }
+                    notesViewModel.onAction(.confirmRename(newTitle))
                 },
                 onCancel: {
-                    notesViewModel.dismissRename()
+                    notesViewModel.onAction(.dismissRename)
                 }
             )
             .presentationDetents([.height(300)])
@@ -74,16 +64,16 @@ private struct LiveNotesRoute: View {
                     Color.black.opacity(0.4)
                         .ignoresSafeArea()
                         .onTapGesture {
-                            notesViewModel.dismissDelete()
+                            notesViewModel.onAction(.dismissDelete)
                         }
                     
                     VoraDeleteModal(
                         memo: dialog.memo,
                         onConfirm: {
-                            Task { await notesViewModel.confirmDelete() }
+                            notesViewModel.onAction(.confirmDelete)
                         },
                         onCancel: {
-                            notesViewModel.dismissDelete()
+                            notesViewModel.onAction(.dismissDelete)
                         }
                     )
                 }

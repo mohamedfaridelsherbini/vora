@@ -17,92 +17,30 @@ struct NotesScreen: View {
     var body: some View {
         ZStack(alignment: .bottom) {
             ScrollView(showsIndicators: false) {
-                VStack(alignment: .leading, spacing: 14) {
-                    NotesHeader(
-                        titleColor: titleColor,
-                        metaColor: metaColor,
-                        summaryText: summaryText,
-                        statusLabel: statusLabel
-                    )
-                    NotesSearchBar(
-                        query: Binding(
-                            get: { searchQuery },
-                            set: onSearchQueryChange
-                        ),
-                        textColor: metaColor,
-                        background: searchBackground,
-                        border: searchBorder
-                    )
-
-                    if mode == .loading {
-                        NotesLoadingFilterRow(
-                            background: sourceChipBackground,
-                            selectedBackground: titleColor
-                        )
-
-                        NotesLoadingStatusCard(
-                            titleColor: titleColor,
-                            subtitleColor: metaColor,
-                            background: cardBackground,
-                            border: cardBorder,
-                            iconColor: metaColor,
-                            accentColor: statusChipAccent,
-                            skeletonColor: sourceChipBackground
-                        )
-
-                        VStack(spacing: 12) {
-                            ForEach(0..<4, id: \.self) { _ in
-                                LoadingMemoCard(
-                                    background: cardBackground,
-                                    border: cardBorder,
-                                    lineColor: searchBorder,
-                                    chipColor: sourceChipBackground
-                                )
-                            }
-                        }
-                    } else if mode == .empty {
-                        NotesEmptyStateCard(
-                            titleColor: titleColor,
-                            subtitleColor: metaColor,
-                            background: emptyStateBackground,
-                            border: emptyStateBorder,
-                            iconColor: emptyStateIconColor
-                        )
-                        .padding(.top, 96)
-                    } else {
-                        NotesFilterRow(
-                            filters: filters,
-                            onSelect: onSelectSourceFilter
-                        )
-
-                        NotesRecentLabel(textColor: metaColor)
-
-                        VStack(spacing: 12) {
-                            ForEach(memos) { memo in
-                                SwipeRevealContainer(
-                                    onRename: { onRenameMemo(memo.id) },
-                                    onDelete: { onDeleteMemo(memo.id) }
-                                ) {
-                                    MemoCard(
-                                        memo: memo,
-                                        background: cardBackground,
-                                        border: cardBorder,
-                                        titleColor: titleColor,
-                                        metaColor: metaColor,
-                                        sourceBackground: sourceChipBackground,
-                                        sourceTextColor: sourceChipText
-                                    )
-                                }
-                            }
-                        }
-                    }
-
-                    Spacer()
-                        .frame(height: 92)
-                }
-                .padding(.horizontal, VoraSpacing.pageHorizontal)
-                .padding(.top, VoraSpacing.pageTop)
-                .padding(.bottom, VoraSpacing.pageBottom)
+                NotesContentView(
+                    mode: mode,
+                    summaryText: summaryText,
+                    statusLabel: statusLabel,
+                    searchQuery: searchQuery,
+                    filters: filters,
+                    memos: memos,
+                    titleColor: titleColor,
+                    metaColor: metaColor,
+                    searchBackground: searchBackground,
+                    searchBorder: searchBorder,
+                    cardBackground: cardBackground,
+                    cardBorder: cardBorder,
+                    emptyStateBackground: emptyStateBackground,
+                    emptyStateBorder: emptyStateBorder,
+                    emptyStateIconColor: emptyStateIconColor,
+                    sourceChipBackground: sourceChipBackground,
+                    sourceChipText: sourceChipText,
+                    statusChipAccent: statusChipAccent,
+                    onSearchQueryChange: onSearchQueryChange,
+                    onSelectSourceFilter: onSelectSourceFilter,
+                    onRenameMemo: onRenameMemo,
+                    onDeleteMemo: onDeleteMemo
+                )
             }
 
             RecordButton(onClick: onRecordClick)

@@ -6,8 +6,19 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXContainerItemProxy section */
+		15481001CFDE4FE3A28C87EB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 66F7755B4FC9242B551F8031 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9ECAC904667EE3915AB68A7E;
+			remoteInfo = iosApp;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		1A6184AB1D2140E193CCFAA5 /* Vora.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Vora.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		2A11332E50D64D40A84E557A /* iosAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = iosAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		ADECF8302FB3810A00735026 /* VoraWatch Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "VoraWatch Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -50,6 +61,11 @@
 			path = "VoraWatch Watch App";
 			sourceTree = "<group>";
 		};
+		B3E0D48E452F4893A8A9841E /* iosAppTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = iosAppTests;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -67,6 +83,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		E42B7F43B0CC44A18A444FDA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -74,6 +97,7 @@
 			isa = PBXGroup;
 			children = (
 				1A6184AB1D2140E193CCFAA5 /* Vora.app */,
+				2A11332E50D64D40A84E557A /* iosAppTests.xctest */,
 				ADECF8302FB3810A00735026 /* VoraWatch Watch App.app */,
 			);
 			name = Products;
@@ -84,6 +108,7 @@
 			children = (
 				9C787FB099EF74A2E7748393 /* Configuration */,
 				8085C848523060C1381E0661 /* iosApp */,
+				B3E0D48E452F4893A8A9841E /* iosAppTests */,
 				ADECF8312FB3810B00735026 /* VoraWatch Watch App */,
 				418B702112E663484A3283AC /* Products */,
 			);
@@ -137,6 +162,29 @@
 			productReference = ADECF8302FB3810A00735026 /* VoraWatch Watch App.app */;
 			productType = "com.apple.product-type.application";
 		};
+		D132BCC708814D2A9BD55A77 /* iosAppTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F74A9D3F590B4E78B0F91D43 /* Build configuration list for PBXNativeTarget "iosAppTests" */;
+			buildPhases = (
+				E007517F33964A77992B1A4C /* Sources */,
+				E42B7F43B0CC44A18A444FDA /* Frameworks */,
+				204F9F649F4648AA86A19D14 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D22ABAA2A4A14592931E9B19 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				B3E0D48E452F4893A8A9841E /* iosAppTests */,
+			);
+			name = iosAppTests;
+			packageProductDependencies = (
+			);
+			productName = iosAppTests;
+			productReference = 2A11332E50D64D40A84E557A /* iosAppTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -152,6 +200,10 @@
 					};
 					ADECF82F2FB3810A00735026 = {
 						CreatedOnToolsVersion = 26.4.1;
+					};
+					D132BCC708814D2A9BD55A77 = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = 9ECAC904667EE3915AB68A7E;
 					};
 				};
 			};
@@ -170,6 +222,7 @@
 			projectRoot = "";
 			targets = (
 				9ECAC904667EE3915AB68A7E /* iosApp */,
+				D132BCC708814D2A9BD55A77 /* iosAppTests */,
 				ADECF82F2FB3810A00735026 /* VoraWatch Watch App */,
 			);
 		};
@@ -177,6 +230,13 @@
 
 /* Begin PBXResourcesBuildPhase section */
 		1018C39303811263904E5035 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		204F9F649F4648AA86A19D14 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -229,9 +289,50 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		E007517F33964A77992B1A4C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		D22ABAA2A4A14592931E9B19 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9ECAC904667EE3915AB68A7E /* iosApp */;
+			targetProxy = 15481001CFDE4FE3A28C87EB /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		0A4C15D7AE9C4DBD80E6D56B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "${TEAM_ID}";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.mohamedfaridelsherbini.vora.VoraTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Vora.app/Vora";
+				TEST_TARGET_NAME = iosApp;
+			};
+			name = Debug;
+		};
 		0F66E7ABC9F82D8F107D0BC8 /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReferenceAnchor = 9C787FB099EF74A2E7748393 /* Configuration */;
@@ -453,6 +554,30 @@
 			};
 			name = Release;
 		};
+		C79FEB8F759B4A7AB43B555F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "${TEAM_ID}";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.mohamedfaridelsherbini.vora.VoraTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Vora.app/Vora";
+				TEST_TARGET_NAME = iosApp;
+			};
+			name = Release;
+		};
 		C846FD487A76E0FCC60FFBFE /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -507,6 +632,15 @@
 			buildConfigurations = (
 				3BCD9755F80DB2824F43A1D2 /* Debug */,
 				0F66E7ABC9F82D8F107D0BC8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F74A9D3F590B4E78B0F91D43 /* Build configuration list for PBXNativeTarget "iosAppTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0A4C15D7AE9C4DBD80E6D56B /* Debug */,
+				C79FEB8F759B4A7AB43B555F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

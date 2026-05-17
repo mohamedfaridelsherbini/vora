@@ -1,6 +1,17 @@
 import Foundation
 import Shared
 
+protocol NotesBridge {
+    func loadSnapshot() async throws -> NotesSnapshot
+    func insertMemo() async throws
+    func renameMemo(id: String, newTitle: String) async throws
+    func deleteMemo(id: String) async throws
+    func selectSourceFilter(key: String)
+    func updateSearchQuery(query: String)
+}
+
+extension IosNotesBridge: NotesBridge {}
+
 @MainActor
 final class NotesViewModel: ObservableObject {
     @Published var mode: NotesScreenMode = .loading
@@ -12,7 +23,36 @@ final class NotesViewModel: ObservableObject {
     @Published var renameDialog: RenameDialogState? = nil
     @Published var deleteDialog: DeleteDialogState? = nil
 
-    private let bridge = IosNotesBridge()
+    private let bridge: NotesBridge
+
+    init(bridge: NotesBridge = IosNotesBridge()) {
+        self.bridge = bridge
+    }
+
+    func onAction(_ action: NotesAction) {
+        switch action {
+        case .load:
+            Task { await load() }
+        case .insertMemo:
+            Task { await insertMemo() }
+        case let .updateSearchQuery(query):
+            Task { await updateSearchQuery(query) }
+        case let .selectSourceFilter(key):
+            Task { await selectSourceFilter(key: key) }
+        case let .requestRename(id):
+            requestRename(id: id)
+        case let .confirmRename(newTitle):
+            Task { await confirmRename(newTitle: newTitle) }
+        case .dismissRename:
+            dismissRename()
+        case let .requestDelete(id):
+            requestDelete(id: id)
+        case .confirmDelete:
+            Task { await confirmDelete() }
+        case .dismissDelete:
+            dismissDelete()
+        }
+    }
 
     func load() async {
         guard let snapshot = try? await bridge.loadSnapshot() else {

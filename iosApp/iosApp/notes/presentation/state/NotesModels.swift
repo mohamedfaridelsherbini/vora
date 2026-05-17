@@ -33,4 +33,3 @@ struct DeleteDialogState: Identifiable {
     let id = UUID()
     let memo: MemoListItem
 }
-
