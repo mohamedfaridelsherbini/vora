@@ -4,14 +4,18 @@ import Shared
 @main
 struct iOSApp: App {
     init() {
-        if !AppRuntime.isXcodePreview {
+        if AppRuntime.shouldBootstrapAppServices {
             KoinIosBootstrap().start()
         }
     }
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            if AppRuntime.isXcodePreview {
+                PreviewSanityView()
+            } else {
+                ContentView()
+            }
         }
     }
 }

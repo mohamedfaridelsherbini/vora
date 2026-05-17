@@ -2,7 +2,7 @@ import SwiftUI
 
 struct NotesRoute: View {
     var body: some View {
-        if AppRuntime.isXcodePreview {
+        if AppRuntime.isXcodePreview || AppRuntime.isRunningTests {
             NotesPreviewRoute()
         } else {
             LiveNotesRoute()
