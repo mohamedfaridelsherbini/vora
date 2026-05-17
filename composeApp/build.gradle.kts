@@ -67,5 +67,6 @@ android {
 
 dependencies {
     implementation(libs.koin.android)
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:${libs.versions.kotlinxCoroutines.get()}")
     debugImplementation(libs.compose.uiTooling)
 }
