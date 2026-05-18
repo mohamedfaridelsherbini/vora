@@ -1,4 +1,5 @@
 import SwiftUI
+import Shared
 
 struct NotesRoute: View {
     var body: some View {
@@ -12,7 +13,15 @@ struct NotesRoute: View {
 
 private struct LiveNotesRoute: View {
     @State private var showSplash = true
-    @StateObject private var notesViewModel = NotesViewModel()
+    @StateObject private var notesViewModel: NotesViewModel
+
+    init(
+        bridge: NotesBridge = IosDependencyResolver().notesBridge()
+    ) {
+        _notesViewModel = StateObject(
+            wrappedValue: NotesViewModel(bridge: bridge)
+        )
+    }
 
     var body: some View {
         ZStack {

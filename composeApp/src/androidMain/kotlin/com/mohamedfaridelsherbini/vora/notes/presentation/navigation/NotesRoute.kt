@@ -11,13 +11,14 @@ import com.mohamedfaridelsherbini.vora.notes.presentation.screen.NotesScreen
 import com.mohamedfaridelsherbini.vora.notes.presentation.state.notesListVisualState
 import com.mohamedfaridelsherbini.vora.notes.presentation.viewmodel.NotesViewModel
 import com.mohamedfaridelsherbini.vora.notes.presentation.viewmodel.NotesViewModelFactory
-import org.koin.core.context.GlobalContext
 
 @Composable
-internal fun NotesRoute() {
+internal fun NotesRoute(
+    notesFeatureService: NotesFeatureService,
+) {
     val factory = remember {
         NotesViewModelFactory(
-            notesFeatureService = GlobalContext.get().get<NotesFeatureService>(),
+            notesFeatureService = notesFeatureService,
         )
     }
     val notesViewModel: NotesViewModel = viewModel(factory = factory)

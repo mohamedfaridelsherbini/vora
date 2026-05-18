@@ -25,8 +25,12 @@ final class NotesViewModel: ObservableObject {
 
     private let bridge: NotesBridge
 
-    init(bridge: NotesBridge = IosNotesBridge()) {
+    init(bridge: NotesBridge) {
         self.bridge = bridge
+    }
+
+    convenience init() {
+        self.init(bridge: IosDependencyResolver().notesBridge())
     }
 
     func onAction(_ action: NotesAction) {
