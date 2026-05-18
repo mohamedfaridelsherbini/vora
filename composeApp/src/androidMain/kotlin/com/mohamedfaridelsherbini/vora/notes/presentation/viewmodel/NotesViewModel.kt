@@ -13,7 +13,6 @@ import com.mohamedfaridelsherbini.vora.notes.presentation.state.NotesSourceFilte
 import com.mohamedfaridelsherbini.vora.notes.presentation.state.NotesUiState
 import com.mohamedfaridelsherbini.vora.notes.presentation.state.RenameDialogState
 import com.mohamedfaridelsherbini.vora.notes.presentation.state.previewLoadingNotesUiState
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -27,7 +26,7 @@ internal class NotesViewModel(
     val uiState: StateFlow<NotesUiState> = _uiState.asStateFlow()
 
     init {
-        refreshNotes(withDelay = true)
+        refreshNotes()
     }
 
     fun onAction(action: NotesAction) {
@@ -103,11 +102,8 @@ internal class NotesViewModel(
         refreshNotes()
     }
 
-    private fun refreshNotes(withDelay: Boolean = false) {
+    private fun refreshNotes() {
         viewModelScope.launch {
-            if (withDelay) {
-                delay(450)
-            }
             _uiState.value = notesFeatureService.loadSnapshot().toUiState()
         }
     }
