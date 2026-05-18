@@ -6,7 +6,9 @@ struct NotesRoute: View {
         if AppRuntime.isXcodePreview || AppRuntime.isRunningTests {
             NotesPreviewRoute()
         } else {
-            LiveNotesRoute()
+            LiveNotesRoute(
+                bridge: IosDependencyResolver().notesBridge()
+            )
         }
     }
 }
@@ -15,9 +17,7 @@ private struct LiveNotesRoute: View {
     @State private var showSplash = true
     @StateObject private var notesViewModel: NotesViewModel
 
-    init(
-        bridge: NotesBridge = IosDependencyResolver().notesBridge()
-    ) {
+    init(bridge: NotesBridge) {
         _notesViewModel = StateObject(
             wrappedValue: NotesViewModel(bridge: bridge)
         )
