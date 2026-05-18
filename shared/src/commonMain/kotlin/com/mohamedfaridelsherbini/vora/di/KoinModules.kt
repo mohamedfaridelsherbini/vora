@@ -9,6 +9,9 @@ import com.mohamedfaridelsherbini.vora.domain.repository.VoiceMemoRepository
 import com.mohamedfaridelsherbini.vora.mock.VoiceMemoMockFactory
 import com.mohamedfaridelsherbini.vora.notes.NotesFeatureService
 import com.mohamedfaridelsherbini.vora.notes.NotesSnapshotFactory
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import org.koin.dsl.module
 
 private class DefaultSharedFoundationDependencies(
@@ -18,9 +21,10 @@ private class DefaultSharedFoundationDependencies(
 ) : SharedFoundationDependencies
 
 val sharedFoundationModule = module {
+    single { CoroutineScope(SupervisorJob() + Dispatchers.Default) }
     single { VoiceMemoMockFactory() }
     single { NotesSnapshotFactory() }
-    single<VoiceMemoRepository> { RoomVoiceMemoRepository(get(), get()) }
+    single<VoiceMemoRepository> { RoomVoiceMemoRepository(get(), get(), get()) }
     single<AudioRecorderRepository> { BootstrapAudioRecorderRepository() }
     single<AudioPlayerRepository> { BootstrapAudioPlayerRepository() }
     single<SharedFoundationDependencies> {
