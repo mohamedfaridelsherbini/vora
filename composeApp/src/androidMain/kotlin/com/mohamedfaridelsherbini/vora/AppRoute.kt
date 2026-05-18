@@ -12,14 +12,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.mohamedfaridelsherbini.vora.notes.NotesFeatureService
 import kotlinx.coroutines.delay
-import org.koin.core.context.GlobalContext
 
 private const val SplashHandoffDurationMs = 420L
 
 @Composable
-internal fun AppRoute() {
+internal fun AppRoute(
+    notesFeatureService: NotesFeatureService,
+) {
     var uiState by remember { mutableStateOf(AppUiState(showSplash = true)) }
-    val notesFeatureService = remember { GlobalContext.get().get<NotesFeatureService>() }
 
     LaunchedEffect(Unit) {
         delay(SplashHandoffDurationMs)
