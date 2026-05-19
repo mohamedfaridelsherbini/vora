@@ -6,23 +6,13 @@ import com.mohamedfaridelsherbini.vora.data.local.toDomain
 import com.mohamedfaridelsherbini.vora.data.local.toEntity
 import com.mohamedfaridelsherbini.vora.domain.model.VoiceMemo
 import com.mohamedfaridelsherbini.vora.domain.repository.VoiceMemoRepository
-import com.mohamedfaridelsherbini.vora.mock.VoiceMemoMockFactory
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 
 class RoomVoiceMemoRepository(
     database: VoraRoomDatabase,
-    private val voiceMemoMockFactory: VoiceMemoMockFactory,
-    private val scope: CoroutineScope,
-    private val nowProvider: () -> Long,
 ) : VoiceMemoRepository {
     private val dao = database.voiceMemoDao()
-
-    init {
-        seedIfEmpty()
-    }
 
     override fun observeVoiceMemos(): Flow<List<VoiceMemo>> =
         dao.observeAll().map { memos -> memos.map(VoiceMemoEntity::toDomain) }
@@ -43,15 +33,5 @@ class RoomVoiceMemoRepository(
 
     override suspend fun deleteVoiceMemo(id: String) {
         dao.delete(id)
-    }
-
-    private fun seedIfEmpty() {
-        // Keep bootstrap data only until real recording/persistence flows are in place.
-        scope.launch {
-            if (dao.countAll() > 0) return@launch
-            voiceMemoMockFactory.seedMemos(nowProvider()).forEach { voiceMemo ->
-                dao.upsert(voiceMemo.toEntity())
-            }
-        }
     }
 }
