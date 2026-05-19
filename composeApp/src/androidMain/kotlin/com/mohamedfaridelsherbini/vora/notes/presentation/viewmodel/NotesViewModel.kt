@@ -12,7 +12,6 @@ import com.mohamedfaridelsherbini.vora.notes.presentation.state.NotesListMode
 import com.mohamedfaridelsherbini.vora.notes.presentation.state.NotesSourceFilterUi
 import com.mohamedfaridelsherbini.vora.notes.presentation.state.NotesUiState
 import com.mohamedfaridelsherbini.vora.notes.presentation.state.RenameDialogState
-import com.mohamedfaridelsherbini.vora.notes.presentation.state.previewLoadingNotesUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,7 +21,16 @@ import kotlinx.coroutines.launch
 internal class NotesViewModel(
     private val notesFeatureService: NotesFeatureService,
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(previewLoadingNotesUiState())
+    private val _uiState = MutableStateFlow(
+        NotesUiState(
+            mode = NotesListMode.Loading,
+            summaryText = "",
+            statusLabel = "",
+            searchQuery = "",
+            filters = emptyList(),
+            memos = emptyList(),
+        )
+    )
     val uiState: StateFlow<NotesUiState> = _uiState.asStateFlow()
 
     init {

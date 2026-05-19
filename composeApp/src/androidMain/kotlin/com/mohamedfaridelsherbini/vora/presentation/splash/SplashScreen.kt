@@ -36,7 +36,7 @@ import androidx.compose.ui.unit.sp
 import com.mohamedfaridelsherbini.vora.R
 import com.mohamedfaridelsherbini.vora.presentation.theme.VoraColors
 import com.mohamedfaridelsherbini.vora.presentation.theme.VoraSpacing
-import com.mohamedfaridelsherbini.vora.presentation.theme.interFontFamily
+import com.mohamedfaridelsherbini.vora.presentation.theme.voraTypography
 
 @Composable
 internal fun VoraSplashScreen() {
@@ -98,10 +98,11 @@ private fun BrandWordmark(
     Text(
         text = text,
         color = color,
-        fontFamily = interFontFamily(),
-        fontWeight = FontWeight.Bold,
-        fontSize = fontSize,
-        lineHeight = lineHeight,
+        style = voraTypography().displaySmall.copy(
+            fontWeight = FontWeight.Bold,
+            fontSize = fontSize,
+            lineHeight = lineHeight,
+        ),
     )
 }
 
@@ -114,10 +115,11 @@ private fun BrandSupportingText(
     Text(
         text = text,
         color = color,
-        fontFamily = interFontFamily(),
-        fontWeight = FontWeight.Medium,
-        fontSize = fontSize,
-        textAlign = TextAlign.Center,
+        style = voraTypography().bodyMedium.copy(
+            fontWeight = FontWeight.Medium,
+            fontSize = fontSize,
+            textAlign = TextAlign.Center,
+        ),
     )
 }
 
