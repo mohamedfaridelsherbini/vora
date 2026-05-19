@@ -13,6 +13,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import org.koin.dsl.module
+import kotlin.time.Clock
 
 private class DefaultSharedFoundationDependencies(
     override val voiceMemoRepository: VoiceMemoRepository,
@@ -22,9 +23,10 @@ private class DefaultSharedFoundationDependencies(
 
 val sharedFoundationModule = module {
     single { CoroutineScope(SupervisorJob() + Dispatchers.Default) }
+    single<() -> Long> { { Clock.System.now().toEpochMilliseconds() } }
     single { VoiceMemoMockFactory() }
     single { NotesSnapshotFactory() }
-    single<VoiceMemoRepository> { RoomVoiceMemoRepository(get(), get(), get()) }
+    single<VoiceMemoRepository> { RoomVoiceMemoRepository(get(), get(), get(), get()) }
     single<AudioRecorderRepository> { BootstrapAudioRecorderRepository() }
     single<AudioPlayerRepository> { BootstrapAudioPlayerRepository() }
     single<SharedFoundationDependencies> {

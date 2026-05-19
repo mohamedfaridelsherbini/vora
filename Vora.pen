@@ -7565,7 +7565,8 @@
                               "fill": "$color-secondary",
                               "content": "Names appear in the list and in transcripts.",
                               "fontFamily": "$font-family",
-                              "fontSize": "$font-caption-size"
+                              "fontSize": "$font-caption-size",
+                              "fontWeight": "normal"
                             },
                             {
                               "type": "text",
@@ -22748,8 +22749,8 @@
     {
       "type": "frame",
       "id": "sc1zk",
-      "x": 200,
-      "y": 7311,
+      "x": 217,
+      "y": 7457,
       "name": "WearRecordScreen",
       "width": 1900,
       "fill": "#EAF1F2",
