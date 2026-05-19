@@ -1,6 +1,6 @@
 package com.mohamedfaridelsherbini.vora.notes.presentation.components
 
-import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.animate
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -23,8 +23,11 @@ import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -37,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mohamedfaridelsherbini.vora.presentation.theme.VoraColors
 import com.mohamedfaridelsherbini.vora.presentation.theme.interFontFamily
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -76,7 +80,8 @@ internal fun SwipeRevealItem(
 ) {
     val density = LocalDensity.current
     val actionWidthPx = with(density) { 164.dp.toPx() }
-    val offsetX = remember { Animatable(0f) }
+    var offsetX by remember { mutableStateOf(0f) }
+    var animationJob by remember { mutableStateOf<Job?>(null) }
     val scope = rememberCoroutineScope()
 
     Box(
@@ -84,20 +89,34 @@ internal fun SwipeRevealItem(
             .fillMaxWidth()
             .pointerInput(Unit) {
                 detectHorizontalDragGestures(
+                    onDragStart = { _ ->
+                        animationJob?.cancel()
+                    },
                     onDragEnd = {
-                        scope.launch {
-                            val target = if (offsetX.value < -actionWidthPx / 2) -actionWidthPx else 0f
-                            offsetX.animateTo(target, tween(300))
+                        animationJob = scope.launch {
+                            val target = if (offsetX < -actionWidthPx / 2) -actionWidthPx else 0f
+                            animate(
+                                initialValue = offsetX,
+                                targetValue = target,
+                                animationSpec = tween(300)
+                            ) { value, _ ->
+                                offsetX = value
+                            }
                         }
                     },
                     onDragCancel = {
-                        scope.launch { offsetX.animateTo(0f, tween(300)) }
+                        animationJob = scope.launch {
+                            animate(
+                                initialValue = offsetX,
+                                targetValue = 0f,
+                                animationSpec = tween(300)
+                            ) { value, _ ->
+                                offsetX = value
+                            }
+                        }
                     },
                     onHorizontalDrag = { _, dragAmount ->
-                        scope.launch {
-                            val newOffset = (offsetX.value + dragAmount).coerceIn(-actionWidthPx, 0f)
-                            offsetX.snapTo(newOffset)
-                        }
+                        offsetX = (offsetX + dragAmount).coerceIn(-actionWidthPx, 0f)
                     },
                 )
             },
@@ -114,7 +133,12 @@ internal fun SwipeRevealItem(
                 icon = Icons.Outlined.Edit,
                 backgroundColor = Color(0xFF607078),
                 onClick = {
-                    scope.launch { offsetX.animateTo(0f) }
+                    animationJob?.cancel()
+                    animationJob = scope.launch {
+                        animate(initialValue = offsetX, targetValue = 0f) { value, _ ->
+                            offsetX = value
+                        }
+                    }
                     onRename()
                 },
             )
@@ -124,14 +148,19 @@ internal fun SwipeRevealItem(
                 icon = Icons.Outlined.DeleteOutline,
                 backgroundColor = VoraColors.Danger,
                 onClick = {
-                    scope.launch { offsetX.animateTo(0f) }
+                    animationJob?.cancel()
+                    animationJob = scope.launch {
+                        animate(initialValue = offsetX, targetValue = 0f) { value, _ ->
+                            offsetX = value
+                        }
+                    }
                     onDelete()
                 },
             )
         }
 
         Box(
-            modifier = Modifier.offset { IntOffset(offsetX.value.roundToInt(), 0) },
+            modifier = Modifier.offset { IntOffset(offsetX.roundToInt(), 0) },
         ) {
             content()
         }
