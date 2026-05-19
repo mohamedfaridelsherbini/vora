@@ -24,6 +24,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -80,7 +81,7 @@ internal fun SwipeRevealItem(
 ) {
     val density = LocalDensity.current
     val actionWidthPx = with(density) { 164.dp.toPx() }
-    var offsetX by remember { mutableStateOf(0f) }
+    var offsetX by remember { mutableFloatStateOf(0f) }
     var animationJob by remember { mutableStateOf<Job?>(null) }
     val scope = rememberCoroutineScope()
 

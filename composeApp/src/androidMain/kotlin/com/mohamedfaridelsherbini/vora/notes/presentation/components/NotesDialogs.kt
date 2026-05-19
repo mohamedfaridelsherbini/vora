@@ -65,7 +65,7 @@ internal fun VoraRenameBottomSheet(
     val focusRequester = remember { FocusRequester() }
     val isDark = isSystemInDarkTheme()
 
-    var fieldValue by remember {
+    var fieldValue by remember(memo.id) {
         mutableStateOf(
             TextFieldValue(
                 text = memo.title,
