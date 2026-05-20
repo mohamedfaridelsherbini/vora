@@ -3,15 +3,15 @@ import Shared
 
 
 struct ContentView: View {
+    @StateObject private var viewModel = NotesViewModel(
+        bridge: IosDependencyResolver().notesBridge()
+    )
+
     var body: some View {
         if AppRuntime.isXcodePreview {
             PreviewSanityView()
         } else {
-            NotesRoute(
-                viewModel: NotesViewModel(
-                    bridge: IosDependencyResolver().notesBridge()
-                )
-            )
+            NotesRoute(viewModel: viewModel)
         }
     }
 }

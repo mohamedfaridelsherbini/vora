@@ -35,7 +35,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mohamedfaridelsherbini.vora.notes.presentation.state.NotesSourceFilterUi
-import com.mohamedfaridelsherbini.vora.notes.presentation.state.NotesSyncStatus
+import com.mohamedfaridelsherbini.vora.notes.NotesSyncStatus
 import com.mohamedfaridelsherbini.vora.presentation.theme.VoraColors
 import com.mohamedfaridelsherbini.vora.presentation.theme.VoraSpacing
 import com.mohamedfaridelsherbini.vora.presentation.theme.voraTypography

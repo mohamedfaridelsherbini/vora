@@ -6,12 +6,12 @@ import androidx.lifecycle.viewModelScope
 import com.mohamedfaridelsherbini.vora.notes.NotesFeatureService
 import com.mohamedfaridelsherbini.vora.notes.NotesSnapshot
 import com.mohamedfaridelsherbini.vora.notes.NotesSnapshotMode
+import com.mohamedfaridelsherbini.vora.notes.NotesSyncStatus
 import com.mohamedfaridelsherbini.vora.notes.presentation.action.NotesAction
 import com.mohamedfaridelsherbini.vora.notes.presentation.state.DeleteDialogState
 import com.mohamedfaridelsherbini.vora.notes.presentation.state.NoteListItemUi
 import com.mohamedfaridelsherbini.vora.notes.presentation.state.NotesListMode
 import com.mohamedfaridelsherbini.vora.notes.presentation.state.NotesSourceFilterUi
-import com.mohamedfaridelsherbini.vora.notes.presentation.state.NotesSyncStatus
 import com.mohamedfaridelsherbini.vora.notes.presentation.state.NotesUiState
 import com.mohamedfaridelsherbini.vora.notes.presentation.state.RenameDialogState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,6 +28,7 @@ internal class NotesViewModel(
             mode = NotesListMode.Loading,
             summaryText = "",
             statusLabel = "",
+            status = NotesSyncStatus.Syncing,
             searchQuery = "",
             filters = emptyList(),
             memos = emptyList(),
@@ -55,8 +56,13 @@ internal class NotesViewModel(
 
     fun insertMemo() {
         viewModelScope.launch {
-            notesFeatureService.insertMemo()
-            refreshNotes()
+            try {
+                notesFeatureService.insertMemo()
+                refreshNotes()
+                _uiState.update { it.copy(errorMessage = null) }
+            } catch (e: Exception) {
+                _uiState.update { it.copy(errorMessage = e.message ?: "Failed to insert memo") }
+            }
         }
     }
 
@@ -71,8 +77,13 @@ internal class NotesViewModel(
         val id = _uiState.value.renameDialog?.memo?.id ?: return
         _uiState.update { it.copy(renameDialog = null) }
         viewModelScope.launch {
-            notesFeatureService.renameMemo(id = id, newTitle = newTitle)
-            refreshNotes()
+            try {
+                notesFeatureService.renameMemo(id = id, newTitle = newTitle)
+                refreshNotes()
+                _uiState.update { it.copy(errorMessage = null) }
+            } catch (e: Exception) {
+                _uiState.update { it.copy(errorMessage = e.message ?: "Failed to rename memo") }
+            }
         }
     }
 
@@ -91,8 +102,13 @@ internal class NotesViewModel(
         val id = _uiState.value.deleteDialog?.memo?.id ?: return
         _uiState.update { it.copy(deleteDialog = null) }
         viewModelScope.launch {
-            notesFeatureService.deleteMemo(id)
-            refreshNotes()
+            try {
+                notesFeatureService.deleteMemo(id)
+                refreshNotes()
+                _uiState.update { it.copy(errorMessage = null) }
+            } catch (e: Exception) {
+                _uiState.update { it.copy(errorMessage = e.message ?: "Failed to delete memo") }
+            }
         }
     }
 
@@ -140,7 +156,7 @@ private fun NotesSnapshot.toUiState(): NotesUiState = NotesUiState(
     },
     summaryText = summaryText,
     statusLabel = statusLabel,
-    status = if (statusLabel == "Syncing") NotesSyncStatus.Syncing else NotesSyncStatus.Synced,
+    status = status,
     searchQuery = searchQuery,
     filters = filters.map { filter ->
         NotesSourceFilterUi(

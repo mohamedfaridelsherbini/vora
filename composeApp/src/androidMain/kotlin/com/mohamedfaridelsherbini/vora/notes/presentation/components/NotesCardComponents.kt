@@ -1,5 +1,6 @@
 package com.mohamedfaridelsherbini.vora.notes.presentation.components
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -357,5 +358,52 @@ private fun EmptyStateCardPreview() {
         background = Color(0xFFF7F9FB),
         borderColor = Color(0xFFF0F3F6),
         iconColor = VoraColors.LogoInk.copy(alpha = 0.78f),
+    )
+}
+
+@Preview(name = "Loading Status Card Dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES, backgroundColor = 0xFF111827)
+@Composable
+private fun LoadingStatusCardPreviewDark() {
+    NotesLoadingStatusCard(
+        titleColor = VoraColors.LogoPaper,
+        subtitleColor = VoraColors.VoraMuted.copy(alpha = 0.72f),
+        background = Color(0xFF161F2D),
+        borderColor = Color(0xFF202C3D),
+        iconTint = Color(0xFFB8C1CD),
+        accentColor = Color(0xFF1D2736),
+        skeletonColor = Color(0xFF24314F),
+    )
+}
+
+@Preview(name = "Loading Memo Card Dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES, backgroundColor = 0xFF111827)
+@Composable
+private fun LoadingMemoCardPreviewDark() {
+    LoadingMemoCard(
+        background = Color(0xFF161F2D),
+        borderColor = Color(0xFF202C3D),
+        lineColor = Color(0xFF24314F),
+        chipColor = Color(0xFF1D2736),
+    )
+}
+
+@Preview(name = "Record Button Dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES, backgroundColor = 0xFF111827)
+@Composable
+private fun RecordFabPreviewDark() {
+    RecordFab(
+        background = Color(0xFFEF2B2A),
+        textColor = VoraColors.VoraWhite,
+        onClick = {},
+    )
+}
+
+@Preview(name = "Empty State Card Dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES, backgroundColor = 0xFF111827)
+@Composable
+private fun EmptyStateCardPreviewDark() {
+    NotesEmptyStateCard(
+        titleColor = VoraColors.LogoPaper,
+        subtitleColor = Color(0xFFB8C1CD),
+        background = Color(0xFF161F2D),
+        borderColor = Color(0xFF202C3D),
+        iconColor = Color(0xFFB8C1CD),
     )
 }

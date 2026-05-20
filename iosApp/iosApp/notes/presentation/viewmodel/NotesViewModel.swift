@@ -36,7 +36,7 @@ final class NotesViewModel: ObservableObject {
     convenience init() {
         struct DummyBridge: NotesBridge {
             func loadSnapshot() async throws -> NotesSnapshot {
-                NotesSnapshot(mode: .empty, summaryText: "0 memos", statusLabel: "Synced", selectedFilterKey: "all", searchQuery: "", filters: [], memos: [])
+                NotesSnapshot(mode: .empty, summaryText: "0 memos", statusLabel: "Synced", status: NotesSyncStatus.synced, selectedFilterKey: "all", searchQuery: "", filters: [], memos: [])
             }
             func insertMemo() async throws {}
             func renameMemo(id: String, newTitle: String) async throws {}
@@ -47,6 +47,10 @@ final class NotesViewModel: ObservableObject {
         self.init(bridge: DummyBridge())
     }
     #endif
+
+    deinit {
+        activeLoadTask?.cancel()
+    }
 
     func onAction(_ action: NotesAction) {
         switch action {

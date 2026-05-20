@@ -42,7 +42,7 @@ struct VoraRenameSheet: View {
                 if !text.isEmpty {
                     Button(action: { text = "" }) {
                         Image(systemName: "xmark")
-                            .font(.inter(size: 14, weight: .bold))
+                            .font(.voraLabelLarge)
                             .foregroundColor(Color.voraMuted)
                             .padding(8)
                     }
@@ -91,7 +91,7 @@ struct VoraRenameSheet: View {
                     HStack(spacing: 8) {
                         if isDark && canSave {
                             Image(systemName: "checkmark")
-                                .font(.inter(size: 14, weight: .bold))
+                                .font(.voraLabelLarge)
                         }
                         Text("Save")
                             .font(.voraLabelLarge)
@@ -131,7 +131,7 @@ struct VoraDeleteModal: View {
                 .frame(width: 48, height: 48)
                 .overlay(
                     Image(systemName: "trash")
-                        .font(.inter(size: 20))
+                        .font(.voraTitle)
                         .foregroundColor(Color.voraDanger)
                 )
                 .padding(.top, 24)
@@ -154,7 +154,7 @@ struct VoraDeleteModal: View {
                     HStack(spacing: 8) {
                         if isDark {
                             Image(systemName: "trash")
-                                .font(.inter(size: 14, weight: .bold))
+                                .font(.voraLabelLarge)
                                 .foregroundColor(.white)
                         }
                         Text("Delete memo")

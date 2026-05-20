@@ -67,11 +67,23 @@ data class NotesSnapshot(
     val mode: NotesSnapshotMode,
     val summaryText: String,
     val statusLabel: String,
+    val status: NotesSyncStatus,
     val selectedFilterKey: String,
     val searchQuery: String,
     val filters: List<NotesSourceFilterChip>,
     val memos: List<NotesMemoItem>,
 )
+
+enum class NotesSyncStatus {
+    Syncing,
+    Synced;
+
+    val displayName: String
+        get() = when (this) {
+            Syncing -> "Syncing"
+            Synced -> "Synced"
+        }
+}
 
 enum class NotesSnapshotMode {
     Loading,

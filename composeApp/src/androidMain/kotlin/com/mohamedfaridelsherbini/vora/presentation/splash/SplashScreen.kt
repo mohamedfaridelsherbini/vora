@@ -36,6 +36,9 @@ import androidx.compose.ui.unit.sp
 import com.mohamedfaridelsherbini.vora.R
 import com.mohamedfaridelsherbini.vora.presentation.theme.VoraColors
 import com.mohamedfaridelsherbini.vora.presentation.theme.VoraSpacing
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
+import android.provider.Settings
 import com.mohamedfaridelsherbini.vora.presentation.theme.voraTypography
 
 @Composable
@@ -45,8 +48,22 @@ internal fun VoraSplashScreen() {
 
 @Composable
 private fun VoraSplashContent(state: SplashVisualState) {
+    val context = LocalContext.current
+    val isReducedMotion = remember(context) {
+        try {
+            val animationScale = Settings.Global.getFloat(
+                context.contentResolver,
+                Settings.Global.TRANSITION_ANIMATION_SCALE,
+                1.0f
+            )
+            animationScale == 0.0f
+        } catch (e: Exception) {
+            false
+        }
+    }
+
     val pulse = rememberInfiniteTransition(label = "voice-pulse")
-    val dotAlpha by pulse.animateFloat(
+    val animatedAlpha by pulse.animateFloat(
         initialValue = 0.4f,
         targetValue = 1f,
         animationSpec = infiniteRepeatable(
@@ -55,6 +72,7 @@ private fun VoraSplashContent(state: SplashVisualState) {
         ),
         label = "dot-alpha",
     )
+    val dotAlpha = if (isReducedMotion) 1f else animatedAlpha
 
     Column(
         modifier = Modifier
@@ -79,8 +97,13 @@ private fun VoraSplashContent(state: SplashVisualState) {
         Spacer(modifier = Modifier.weight(1f))
         PulseDots(VoraColors.LogoBlue, listOf(dotAlpha, dotAlpha * 0.8f, dotAlpha * 0.55f), 6.dp, 8.dp)
         Spacer(modifier = Modifier.height(12.dp))
+        val footerText = if (isReducedMotion) {
+            "Voice pulse • reduced-motion: fade only"
+        } else {
+            "Voice pulse • 1.2s ease-in-out"
+        }
         BrandSupportingText(
-            "Voice pulse • 1.2s ease-in-out • reduced-motion: fade only",
+            footerText,
             state.footerColor,
             11.sp,
         )

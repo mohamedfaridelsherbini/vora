@@ -4,6 +4,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import com.mohamedfaridelsherbini.vora.presentation.theme.VoraColors
+import com.mohamedfaridelsherbini.vora.notes.NotesSyncStatus
 
 internal data class NoteListItemUi(
     val id: String,
@@ -34,21 +35,17 @@ internal data class DeleteDialogState(
     val memo: NoteListItemUi,
 )
 
-internal enum class NotesSyncStatus {
-    Syncing,
-    Synced,
-}
-
 internal data class NotesUiState(
     val mode: NotesListMode,
     val summaryText: String,
     val statusLabel: String,
-    val status: NotesSyncStatus = if (statusLabel == "Syncing") NotesSyncStatus.Syncing else NotesSyncStatus.Synced,
+    val status: NotesSyncStatus,
     val searchQuery: String,
     val filters: List<NotesSourceFilterUi>,
     val memos: List<NoteListItemUi>,
     val renameDialog: RenameDialogState? = null,
     val deleteDialog: DeleteDialogState? = null,
+    val errorMessage: String? = null,
 )
 
 internal data class NotesListVisualState(
@@ -129,6 +126,7 @@ internal fun previewLoadedNotesUiState(): NotesUiState = NotesUiState(
     mode = NotesListMode.Loaded,
     summaryText = "12 memos · 18 min",
     statusLabel = "Synced",
+    status = NotesSyncStatus.Synced,
     searchQuery = "",
     filters = listOf(
         NotesSourceFilterUi("all", "All", 12, true),
@@ -146,6 +144,7 @@ internal fun previewEmptyNotesUiState(): NotesUiState = NotesUiState(
     mode = NotesListMode.Empty,
     summaryText = "0 memos",
     statusLabel = "Synced",
+    status = NotesSyncStatus.Synced,
     searchQuery = "",
     filters = listOf(
         NotesSourceFilterUi("all", "All", 0, true),
@@ -160,6 +159,7 @@ internal fun previewLoadingNotesUiState(): NotesUiState = NotesUiState(
     mode = NotesListMode.Loading,
     summaryText = "Loading local library",
     statusLabel = "Syncing",
+    status = NotesSyncStatus.Syncing,
     searchQuery = "",
     filters = listOf(
         NotesSourceFilterUi("all", "All", 0, true),

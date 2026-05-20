@@ -314,6 +314,44 @@ class NotesViewModelActionTest {
         assertEquals("0 memos", viewModel.uiState.value.summaryText)
     }
 
+    @Test
+    fun confirmRename_repositoryThrows_setsErrorMessage() = runTest {
+        val repository = FakeVoiceMemoRepository(seedMemos(), throwOnRename = true)
+        val viewModel = buildViewModel(repository)
+        advanceUntilIdle()
+
+        viewModel.onAction(NotesAction.RequestRename("memo-a"))
+        viewModel.onAction(NotesAction.ConfirmRename("New Title"))
+        advanceUntilIdle()
+
+        assertEquals("Rename failed", viewModel.uiState.value.errorMessage)
+    }
+
+    @Test
+    fun confirmDelete_repositoryThrows_setsErrorMessage() = runTest {
+        val repository = FakeVoiceMemoRepository(seedMemos(), throwOnDelete = true)
+        val viewModel = buildViewModel(repository)
+        advanceUntilIdle()
+
+        viewModel.onAction(NotesAction.RequestDelete("memo-a"))
+        viewModel.onAction(NotesAction.ConfirmDelete)
+        advanceUntilIdle()
+
+        assertEquals("Delete failed", viewModel.uiState.value.errorMessage)
+    }
+
+    @Test
+    fun recordMemo_repositoryThrows_setsErrorMessage() = runTest {
+        val repository = FakeVoiceMemoRepository(seedMemos(), throwOnUpsert = true)
+        val viewModel = buildViewModel(repository)
+        advanceUntilIdle()
+
+        viewModel.onAction(NotesAction.RecordMemo)
+        advanceUntilIdle()
+
+        assertEquals("Upsert failed", viewModel.uiState.value.errorMessage)
+    }
+
     private fun buildViewModel(repository: FakeVoiceMemoRepository = FakeVoiceMemoRepository(seedMemos())): NotesViewModel {
         val useCases = createUseCases(repository)
         val testClock = object : Clock {
@@ -373,7 +411,12 @@ class NotesViewModelActionTest {
     )
 }
 
-private class FakeVoiceMemoRepository(initial: List<VoiceMemo>) : VoiceMemoRepository {
+private class FakeVoiceMemoRepository(
+    initial: List<VoiceMemo>,
+    private val throwOnUpsert: Boolean = false,
+    private val throwOnRename: Boolean = false,
+    private val throwOnDelete: Boolean = false,
+) : VoiceMemoRepository {
     private val memos = MutableStateFlow(initial)
 
     override fun observeVoiceMemos(): Flow<List<VoiceMemo>> = memos.asStateFlow()
@@ -381,6 +424,7 @@ private class FakeVoiceMemoRepository(initial: List<VoiceMemo>) : VoiceMemoRepos
     override suspend fun getVoiceMemo(id: String): VoiceMemo? = memos.value.firstOrNull { it.id == id }
 
     override suspend fun upsertVoiceMemo(voiceMemo: VoiceMemo) {
+        if (throwOnUpsert) throw RuntimeException("Upsert failed")
         memos.update { current ->
             val idx = current.indexOfFirst { it.id == voiceMemo.id }
             if (idx == -1) current + voiceMemo else current.toMutableList().apply { this[idx] = voiceMemo }
@@ -388,12 +432,14 @@ private class FakeVoiceMemoRepository(initial: List<VoiceMemo>) : VoiceMemoRepos
     }
 
     override suspend fun renameVoiceMemo(id: String, title: String) {
+        if (throwOnRename) throw RuntimeException("Rename failed")
         memos.update { current ->
             current.map { memo -> if (memo.id == id) memo.copy(title = title) else memo }
         }
     }
 
     override suspend fun deleteVoiceMemo(id: String) {
+        if (throwOnDelete) throw RuntimeException("Delete failed")
         memos.update { current -> current.filterNot { it.id == id } }
     }
 }

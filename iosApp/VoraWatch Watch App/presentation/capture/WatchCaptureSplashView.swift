@@ -32,4 +32,8 @@ struct WatchCaptureSplashView: View {
         }
     }
 }
-
+struct WatchCaptureSplashView_Previews: PreviewProvider {
+    static var previews: some View {
+        WatchCaptureSplashView()
+    }
+}

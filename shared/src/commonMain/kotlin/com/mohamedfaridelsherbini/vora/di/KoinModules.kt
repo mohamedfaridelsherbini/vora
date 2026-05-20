@@ -12,6 +12,10 @@ import com.mohamedfaridelsherbini.vora.notes.NotesSnapshotFactory
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
+interface PlatformDemoConfig {
+    val isDemoMode: Boolean
+}
+
 private class DefaultSharedFoundationDependencies(
     override val voiceMemoRepository: VoiceMemoRepository,
     override val audioRecorderRepository: AudioRecorderRepository,
@@ -19,7 +23,9 @@ private class DefaultSharedFoundationDependencies(
 ) : SharedFoundationDependencies
 
 val sharedFoundationModule = module {
-    single(named("isDemoMode")) { true }
+    single(named("isDemoMode")) {
+        getOrNull<PlatformDemoConfig>()?.isDemoMode ?: false
+    }
     single { VoiceMemoMockFactory() }
     single { NotesSnapshotFactory(get()) }
     single<VoiceMemoRepository> { RoomVoiceMemoRepository(get()) }

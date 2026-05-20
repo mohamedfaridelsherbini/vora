@@ -62,7 +62,7 @@ struct NotesErrorStateCard: View {
             Button(action: onRetry) {
                 HStack(spacing: 8) {
                     Image(systemName: "arrow.clockwise")
-                        .font(.inter(size: 12, weight: .bold))
+                        .font(.voraLabel)
                     Text("Retry")
                         .font(.voraLabel)
                 }
@@ -223,7 +223,7 @@ struct RecordButton: View {
                     .frame(width: 64, height: 64)
 
                 Image(systemName: "mic.fill")
-                    .font(.inter(size: 22, weight: .semibold))
+                    .font(.voraTitleLarge)
                     .foregroundStyle(.white)
             }
         }
@@ -295,4 +295,30 @@ private struct LoadingLineFlexible: View {
     RecordButton(onClick: {})
         .padding()
         .background(Color.voraPaper)
+}
+
+#Preview("Error State Card") {
+    NotesErrorStateCard(
+        message: "Unable to connect to the local SQLite database driver.",
+        titleColor: .voraLogoInk,
+        subtitleColor: .voraMuted,
+        background: .voraWhite,
+        border: Color(hex: 0xEDF2F5),
+        iconColor: Color(hex: 0xC95B4A),
+        onRetry: {}
+    )
+    .padding()
+    .background(Color.voraPaper)
+}
+
+#Preview("Empty State Card") {
+    NotesEmptyStateCard(
+        titleColor: .voraLogoInk,
+        subtitleColor: .voraMuted,
+        background: Color(hex: 0xF7F9FB),
+        border: Color(hex: 0xF0F3F6),
+        iconColor: .voraLogoInk.opacity(0.78)
+    )
+    .padding()
+    .background(Color.voraPaper)
 }

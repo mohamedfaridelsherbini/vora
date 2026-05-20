@@ -2,6 +2,7 @@ package com.mohamedfaridelsherbini.vora.notes.presentation.state
 
 import androidx.compose.ui.graphics.Color
 import com.mohamedfaridelsherbini.vora.presentation.theme.VoraColors
+import com.mohamedfaridelsherbini.vora.notes.NotesSyncStatus
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -98,6 +99,7 @@ class NotesUiStateTest {
             mode = NotesListMode.Loaded,
             summaryText = "0 memos",
             statusLabel = "Synced",
+            status = NotesSyncStatus.Synced,
             searchQuery = "",
             filters = emptyList(),
             memos = emptyList()
