@@ -5,6 +5,7 @@ extension Font {
         .custom("Inter", size: size).weight(weight)
     }
 
+    static let voraWatchHeadlineSmall = interWatch(size: 24, weight: .bold)
     static let voraWatchTitle       = interWatch(size: 20, weight: .semibold)
     static let voraWatchTitleSmall  = interWatch(size: 16, weight: .medium)
     static let voraWatchBody        = interWatch(size: 16, weight: .regular)
@@ -12,3 +13,4 @@ extension Font {
     static let voraWatchLabel       = interWatch(size: 12, weight: .medium)
     static let voraWatchCaption     = interWatch(size: 11, weight: .regular)
 }
+

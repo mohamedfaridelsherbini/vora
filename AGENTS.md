@@ -4,6 +4,12 @@
 
 This file defines how coding agents operate in Vora. It is a delivery contract for architecture, ownership, and review discipline across Android, iOS, wearable, and automotive surfaces.
 
+## Architecture Diagrams
+
+Full UML reference — module graph, clean architecture layers, class diagram, DI graph, and expect/actual map — lives in **[UML.md](./UML.md)**.
+
+Diagrams use Mermaid syntax and render natively in GitHub, JetBrains IDEs, and VS Code (Markdown Preview Mermaid Support).
+
 ## Project Context
 
 | Item | Value |
@@ -67,6 +73,254 @@ This file defines how coding agents operate in Vora. It is a delivery contract f
 - Every module should expose a clear composition root or DI entry point in its `di/` area.
 - Constructor injection is the default. Service locator style access is forbidden except where a platform framework forces it at the boundary.
 - Dispatchers, clocks, ID generators, and other environment dependencies must be injectable.
+
+## UI Structure Contract
+
+All platform UI must use the same responsibility split. Do not keep routing, state, layout, and leaf components in one file once a screen is beyond trivial bootstrap code.
+
+### Unified feature architecture
+
+The following feature structure is the primary and enforced architecture for the entire project. It is the single source of truth for all generated features, modules, screens, tests, previews, and implementations.
+
+```text
+feature/
+  presentation/
+    screen/
+    components/
+    state/
+    action/
+    viewmodel/
+    navigation/
+  domain/
+  data/
+```
+
+This same mental model must be mirrored across Compose and SwiftUI even when syntax differs.
+
+Folder responsibilities:
+
+- `presentation/` contains all UI and presentation-layer logic.
+- `presentation/screen/` contains Route/View entry points, screen orchestration, stateless screen rendering, and screen previews.
+- `presentation/components/` contains reusable UI components, medium/large composables/views, shared feature UI blocks, and independently previewable component previews.
+- `presentation/state/` contains immutable UI state models, screen state definitions, and view rendering state.
+- `presentation/action/` contains user actions, UI events, intent definitions, and screen interaction contracts.
+- `presentation/viewmodel/` contains ViewModels, presentation logic, state orchestration, and action handling.
+- `presentation/navigation/` contains navigation routes, navigation graphs, deep links, and navigation coordinators.
+- `domain/` contains business logic, use cases, domain models, repository contracts/interfaces, and pure business rules.
+- `data/` contains repository implementations, API services, DTOs, local database code, data sources, mappers, and cache implementations.
+
+Enforcement:
+
+- Always generate features using this structure before implementation begins.
+- Never flatten feature folders.
+- Never mix presentation, domain, and data responsibilities.
+- Never place ViewModels outside `presentation/viewmodel/`.
+- Never place reusable UI outside `presentation/components/`.
+- Never place use cases inside `presentation/`.
+- Never place repositories directly inside screens/views.
+- Keep state models inside `presentation/state/`.
+- Keep actions/events inside `presentation/action/`.
+- Keep navigation isolated inside `presentation/navigation/`.
+
+### Required screen split
+
+| Layer | Responsibility | Android / Wear / Car example | iOS / watchOS example |
+| --- | --- | --- | --- |
+| App entry | platform entry point only | `App.kt`, `WearEntryActivity.kt`, `CarEntryActivity.kt` | `ContentView.swift`, `WatchRecordView.swift` |
+| Route | startup handoff, navigation choice, state-owner binding | `NotesRoute.kt`, `CaptureRoute.kt`, `HomeRoute.kt` | `NotesRoute.swift`, `WatchCaptureRoute.swift` |
+| UI state | immutable screen state and visual state types | `NotesUiState.kt`, `SplashUiState.kt`, `HomeUiState.kt` | `NotesModels.swift` |
+| Screen | top-level feature layout and section composition | `NotesScreen.kt`, `CaptureScreen.kt`, `HomeScreen.kt` | `NotesScreen.swift`, `WatchCaptureScreen.swift` |
+| Components | reusable feature-level UI parts | `NotesComponents.kt` | `NotesComponents.swift` |
+| Theme | tokens, spacing, colors, typography | `presentation/theme/` | `presentation/theme/` |
+
+### Feature-first UI folders
+
+- Android mobile: `composeApp/src/androidMain/kotlin/.../<feature>/presentation/`
+- iPhone: `iosApp/iosApp/<feature>/presentation/`
+- Wear OS: `wearApp/src/main/java/.../<feature>/presentation/`
+- Apple Watch: `iosApp/VoraWatch Watch App/<feature>/presentation/`
+- Car: `carApp/src/main/java/.../<feature>/presentation/`
+
+### UI file rules
+
+- Entry files may host platform bootstrapping only. They must not contain full page UI trees.
+- Route files may orchestrate timing, navigation, and state selection. They must not become rendering-heavy.
+- One screen file should contain the screen structure only.
+- Reusable or complex UI parts should be split into separate files.
+- Screen files compose sections and own page-level layout only.
+- Components files own headers, cards, chips, search bars, buttons, and other reusable feature UI parts.
+- UI state files own immutable screen contracts. Do not bury state types inside unrelated files.
+- If a page starts mixing route logic, state, and reusable sections, split it before adding more behavior.
+
+### Compose and SwiftUI parity rules
+
+- Compose flow must follow: `Route -> Screen -> Content -> Components`.
+- SwiftUI flow must follow: `View -> ContentView -> Components`.
+- Route/View layers wire state owners and navigation only.
+- Screen/Content layers render from immutable `UiState` and explicit actions/events.
+- Reusable components must not own business rules or deep navigation policy.
+- Split files when UI is reusable, visually complex, independently testable, or the screen file is becoming large.
+- Avoid over-splitting tiny private text/button wrappers into separate files.
+
+### Forbidden UI architecture patterns
+
+- Flattened feature folders such as:
+  - `feature/ui/`
+  - `feature/vm/`
+  - `feature/utils/`
+- Mixed responsibility folders such as:
+  - `feature/screen/`
+  - `feature/repository/`
+  - `feature/api/`
+- Massive screen/view files (especially 500+ lines without decomposition)
+- Business logic inside composables or SwiftUI views
+- Repository/data-source usage inside UI rendering layers
+- ViewModel injection into reusable leaf components by default
+- Deep navigation logic nested inside small UI components
+- Splitting every tiny primitive into its own file
+- Missing previews for major UI states
+- Only one happy-path preview on stateful screens
+- No dark/light preview coverage
+- No multi-device previews where a feature supports multiple form factors
+
+### State and action contract
+
+- Default contract is `UiState + Action/Event`.
+- `UiState` must be immutable and represent full render state for the screen.
+- Actions/events must be explicit and flow through screen state owners.
+- Screen/view files orchestrate structure only; they should not mutate business state directly.
+
+### Preview standards (mandatory)
+
+- Generate previews for every major screen, content layer, and reusable component.
+- Minimum state previews: loading, empty, error, success.
+- Include both dark and light mode previews.
+- Include long-text previews where text clipping/wrapping is possible.
+- Include accessibility previews (font scaling/dynamic type) when typography density matters.
+- Multi-device previews are required when the feature supports those form factors:
+  - small phone
+  - standard/large phone
+  - tablet/foldable
+  - landscape when layout behavior changes
+
+Compose preview expectations:
+
+- Use `@Preview` for all major composables.
+- Use additional `@Preview` variants for device and night mode when relevant.
+- Use explicit preview names such as `FeatureScreenPreview_Loading` and `FeatureScreenPreview_Error`.
+
+SwiftUI preview expectations:
+
+- Use `#Preview` or `PreviewProvider` based on target compatibility.
+- Include state-specific and device-specific previews.
+- Use explicit preview names such as `LoadingPreview`, `EmptyPreview`, `ErrorPreview`, `SuccessPreview`.
+
+### AI generation sequence
+
+When generating UI, agents must build in this order:
+
+1. Feature folder structure
+2. Route/View entry
+3. Screen/Content rendering layer
+4. Reusable components
+5. ViewModel + state + actions
+6. Previews for states, themes, accessibility, and supported devices
+
+Agents must never generate one-file UI implementations that mix route, rendering, business rules, and data access.
+
+## Testing Requirements (Mandatory)
+
+All agents must generate or update tests with every implementation change.
+
+Required test types per feature:
+
+- Unit tests
+- UI tests
+- Snapshot tests
+- State rendering tests
+- Error-state tests
+- Edge-case tests
+
+### Unit test contract
+
+- Every public function must be covered by tests through public behavior.
+- Never test private functions directly.
+- Minimum behavior coverage:
+  - success path
+  - error path
+  - empty input
+  - invalid input
+  - boundary cases
+- Must cover:
+  - mappers
+  - reducers/state transition logic
+  - use cases
+  - ViewModel action/event handling
+  - repository behavior using fake data sources
+
+### Compose test contract
+
+- Add/update:
+  - ViewModel unit tests
+  - use case unit tests
+  - mapper unit tests
+  - Compose UI tests
+  - snapshot tests when UI changes
+- Prefer:
+  - JUnit
+  - Kotlin Coroutines Test
+  - Turbine
+  - MockK or fakes
+  - Compose UI Test
+  - Paparazzi or Roborazzi
+
+### SwiftUI test contract
+
+- Add/update:
+  - ViewModel unit tests
+  - use case unit tests
+  - mapper unit tests
+  - UI tests with XCTest
+  - snapshot tests when UI changes
+- Prefer:
+  - XCTest
+  - Swift Concurrency testing
+  - fake implementations
+  - SnapshotTesting or approved project snapshot tool
+
+### UI and snapshot expectations
+
+- UI tests must verify loading, empty, error, and success states.
+- UI tests must verify user actions trigger expected callbacks/events.
+- UI tests must verify navigation events where applicable.
+- UI tests must verify accessibility labels for important controls.
+- Snapshot tests must cover light/dark, small/large device, long text, and all major UI states.
+- Snapshots are updated only when the visual change is intentional.
+
+### Test generation behavior
+
+When implementing or modifying code, agents must:
+
+1. Add or update unit tests.
+2. Add or update UI tests.
+3. Add or update snapshot tests when UI changes.
+4. Cover all `UiState` cases.
+5. Cover all action/event handling paths.
+6. Use fake dependencies by default.
+7. Prefer behavior-based assertions over implementation-detail assertions.
+8. Explain explicitly when a required test cannot be added.
+
+### Forbidden testing patterns
+
+- untested public functions
+- happy-path-only tests
+- real network/database in unit tests
+- snapshot coverage that misses state variants
+- UI tests without accessibility selectors
+- flaky time-based tests
+- private-function testing
+- over-mocking when a fake is simpler
+- missing ViewModel state transition assertions
 
 ## Ownership Matrix
 
@@ -195,6 +449,7 @@ Deliver production Android behavior for handheld capture, playback, storage, and
 - Are main-thread blocking calls avoided?
 - Are repositories, use cases, and services injected instead of manually created in UI or activities?
 - Is the route/container/content split clear where the screen is non-trivial?
+- Does the feature follow `feature/presentation/{screen,components,state,action,viewmodel,navigation}` instead of a flattened or mixed folder?
 - Does each composable have one rendering responsibility?
 - Are child composable parameters narrow and role-specific instead of whole-screen objects by default?
 - Can design-system or leaf components be previewed without constructing app dependencies?
@@ -240,6 +495,7 @@ Deliver Apple-native experiences while reusing shared business logic instead of 
 - Is AVAudioSession ownership explicit?
 - Does Swift code consume shared contracts rather than replacing them?
 - Are services and coordinators injected into state owners instead of created inside views?
+- Does the feature use `Route + Models/UiState + Screen + Components` instead of a giant SwiftUI file?
 
 **Anti-patterns**
 

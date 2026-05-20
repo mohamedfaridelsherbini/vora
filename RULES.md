@@ -103,35 +103,120 @@ Do not:
 - leak storage schema into domain contracts
 - duplicate business rules on Android and iOS
 
+## Unified UI Architecture Rules
+
+- The following feature structure is the primary and enforced architecture for the entire project.
+- This structure is the single source of truth for feature organization.
+- Use one mental model across Compose, SwiftUI, and KMP presentation boundaries.
+- Organize by feature, not by widget type or framework convenience.
+- UI rendering is stateless by default.
+- UI receives immutable `UiState` plus explicit `Action`/`Event` callbacks.
+- Navigation orchestration belongs to route/view entry layers, not reusable components.
+- Shared/domain/data concerns must not leak into UI files.
+
+Every feature should follow this layout:
+
+```text
+feature/
+  presentation/
+    screen/
+    components/
+    state/
+    action/
+    viewmodel/
+    navigation/
+  domain/
+  data/
+```
+
+Folder responsibilities:
+
+- `presentation/` contains all UI and presentation-layer logic.
+- `presentation/screen/` contains Route/View entry points, screen orchestration, stateless screen rendering, and screen previews.
+- `presentation/components/` contains reusable UI components, medium/large composables/views, shared feature UI blocks, and independently previewable component previews.
+- `presentation/state/` contains immutable UI state models, screen state definitions, and view rendering state.
+- `presentation/action/` contains user actions, UI events, intent definitions, and screen interaction contracts.
+- `presentation/viewmodel/` contains ViewModels, presentation logic, state orchestration, and action handling.
+- `presentation/navigation/` contains navigation routes, navigation graphs, deep links, and navigation coordinators.
+- `domain/` contains business logic, use cases, domain models, repository contracts/interfaces, and pure business rules.
+- `data/` contains repository implementations, API services, DTOs, local database code, data sources, mappers, and cache implementations.
+
+Enforcement:
+
+- Always generate features using the primary structure before implementation begins.
+- Never flatten feature folders.
+- Never mix presentation, domain, and data responsibilities.
+- Never place ViewModels outside `presentation/viewmodel/`.
+- Never place reusable UI outside `presentation/components/`.
+- Never place use cases inside `presentation/`.
+- Never place repositories directly inside screens/views.
+- Keep state models inside `presentation/state/`.
+- Keep actions/events inside `presentation/action/`.
+- Keep navigation isolated inside `presentation/navigation/`.
+
+Forbidden feature structures:
+
+```text
+feature/
+  ui/
+  vm/
+  utils/
+```
+
+```text
+feature/
+  screen/
+  repository/
+  api/
+```
+
 ## Compose Rules
 
-- Composables are stateless by default.
-- Hoist state to a screen-level state holder.
-- Keep side effects in effect handlers or ViewModels, not render code.
-- Build reusable components for memo cards, controls, and empty states.
-- Keep navigation orchestration outside leaf composables.
-- Split screen concerns into distinct roles:
-  - route/composition entry
-  - screen container
-  - state holder
-  - pure UI components
-- Keep each composable focused on one rendering responsibility.
-- Pass only the data and callbacks a child needs.
-- Prefer feature-specific UI contracts over broad generic prop bags.
-- Extract behavior behind small interfaces when UI depends on platform services or coordinators.
-- Keep previewable composables free of repository, recorder, player, or navigator construction.
-- Model screen state as a single immutable snapshot plus explicit events.
+- Compose structure must follow: `Route -> Screen -> Content -> Components`.
+- `Route` collects `Flow`/`StateFlow`, wires `ViewModel`, and coordinates navigation callbacks.
+- `Screen` orchestrates layout and maps UI state only.
+- `Content` is pure/stateless rendering from immutable `UiState` and callbacks.
+- `Components` hold reusable or complex UI blocks.
+- Hoist mutable state out of leaf composables.
+- Keep side effects in `ViewModel` or controlled effect handlers, never in rendering branches.
+- Use feature-based naming and files, for example:
+  - `NotesListRoute.kt`
+  - `NotesListScreen.kt`
+  - `NotesListContent.kt`
+  - `NoteItem.kt`
+  - `NotesTopBar.kt`
+- Split components only when they are reused, visually complex, independently testable, or the file is getting large.
+- Avoid splitting tiny private composables into separate files.
 
 Do not:
 
 - call repositories from composables
 - keep business logic in composables
-- build massive screens instead of smaller components
+- build massive screen files
 - spread mutable state across sibling composables
 - pass entire state holders or ViewModels deep through the tree
 - create "god composables" that own layout, business rules, navigation, and side effects
 - use parameter lists that mix unrelated concerns just to avoid extracting components
 - hide imperative work in `remember {}` blocks that should live in a state holder
+- place deep navigation logic inside reusable components
+
+## Compose Preview Rules
+
+- Every major screen/content/component composable must include `@Preview`.
+- Provide previews for both light and dark mode.
+- Provide previews for all major states: loading, empty, error, success.
+- Provide at least one long-text preview where text truncation/wrapping risk exists.
+- Provide multi-device previews when the feature supports those form factors:
+  - small phone
+  - standard phone
+  - tablet/foldable
+  - landscape when layout behavior changes
+- Provide accessibility text-scale previews when typography density matters.
+- Use clear preview naming, for example:
+  - `NotesListScreenPreview_Loading`
+  - `NotesListScreenPreview_Error`
+  - `NotesListScreenPreview_Empty`
+  - `NotesListScreenPreview_Success`
 
 ## SOLID for Compose UI
 
@@ -157,16 +242,72 @@ Reject:
 
 ## SwiftUI Rules
 
-- Views must stay lightweight.
-- Use `ObservableObject` or the project’s chosen observable state pattern for screen state.
+- SwiftUI must mirror the Compose architecture model.
+- SwiftUI structure must follow: `View -> ContentView -> Components`.
+- `View` owns `@StateObject` and navigation coordination.
+- `ContentView` is stateless rendering from immutable `UiState` and closure actions.
+- `Components` are reusable medium/large blocks that are independently previewable.
+- Use feature-based names, for example:
+  - `NotesListView.swift`
+  - `NotesListContentView.swift`
+  - `NoteRowView.swift`
+- Keep views lightweight and use `ObservableObject` (or project standard) for presentation state.
 - Follow native Apple navigation and interaction conventions.
 - Isolate AVFoundation and WatchConnectivity orchestration from view bodies.
+- Avoid over-fragmentation into tiny one-line component files.
 
 Do not:
 
 - default to UIKit when SwiftUI is sufficient
 - duplicate shared use-case logic in Swift
 - mutate AVAudioSession from multiple unrelated views
+- access repositories directly from views/content views
+- place business logic in SwiftUI render code
+- nest navigation policy deeply in small reusable components
+
+## SwiftUI Preview Rules
+
+- Every major screen/content/component view must include `#Preview` (or `PreviewProvider` where required).
+- Provide previews for both light and dark mode.
+- Provide previews for all major states: loading, empty, error, success.
+- Provide previews that cover dynamic type sizes when text density matters.
+- Provide multi-device previews when the feature supports those form factors:
+  - small phone (for example iPhone SE class)
+  - standard/large phone (for example iPhone Pro class)
+  - iPad where supported
+- Keep reusable components independently previewable.
+- Use clear state-oriented preview naming, for example:
+  - `LoadingPreview`
+  - `ErrorPreview`
+  - `EmptyPreview`
+  - `SuccessPreview`
+
+## UI State Management Rules
+
+- UI contract should be `UiState + Action/Event`.
+- `UiState` must be immutable and represent the complete render snapshot for a screen.
+- `Action` or `Event` types should be explicit, predictable, and testable.
+- `ViewModel` translates actions into state transitions through use cases, not repositories directly in UI.
+
+Do not:
+
+- expose mutable domain/data objects directly to UI
+- keep hidden mutable state inside reusable components unless truly required for isolated UI behavior
+- bypass state holders with ad hoc side effects from components
+
+## Preview Requirements (Mandatory)
+
+- Missing previews are treated as incomplete UI work.
+- One happy-path preview is not sufficient.
+- All screens/content/components should be previewed against major UI states and theme modes.
+- Preview coverage must be kept consistent across Compose and SwiftUI for equivalent features.
+
+Do not:
+
+- skip previews for new UI
+- ship only one success preview for stateful screens
+- omit dark/light validation
+- omit multi-device validation where supported
 
 ## Audio Rules
 
@@ -224,6 +365,127 @@ Do not:
 - rely only on manual testing for recording, playback, and deletion paths
 - merge contract changes without test updates
 - use brittle UI tests as a substitute for domain coverage
+
+## Mandatory Test Generation Rules
+
+- Every implementation change must include tests or test updates.
+- Required test types per feature:
+  - unit tests
+  - UI tests
+  - snapshot tests
+  - state rendering tests
+  - error-state tests
+  - edge-case tests
+- If a required test cannot be added, document the reason explicitly in the change summary.
+
+## Unit Test Requirements
+
+- Every public function must be covered by unit tests through public behavior.
+- Do not test private functions directly.
+- Minimum coverage for public behavior:
+  - success path
+  - error path
+  - empty input
+  - invalid input
+  - boundary conditions
+- Include tests for:
+  - mapping functions
+  - reducers/state transformers
+  - use cases
+  - ViewModel actions/events
+  - repository behavior with fake data sources
+
+## Compose Testing Rules
+
+- Required for Compose feature work:
+  - ViewModel unit tests
+  - use case unit tests
+  - mapper unit tests
+  - Compose UI tests
+  - screenshot/snapshot tests when UI changes
+- Preferred toolchain:
+  - JUnit
+  - Kotlin Coroutines Test
+  - Turbine for `Flow` testing
+  - MockK or fake implementations
+  - Compose UI Test
+  - Paparazzi or Roborazzi for snapshot testing
+
+## SwiftUI Testing Rules
+
+- Required for SwiftUI feature work:
+  - ViewModel unit tests
+  - use case unit tests
+  - mapper unit tests
+  - UI tests with XCTest
+  - snapshot tests when UI changes
+- Preferred toolchain:
+  - XCTest
+  - Swift Concurrency testing
+  - fake implementations
+  - SnapshotTesting or project-approved snapshot tool
+
+## UI Test Requirements
+
+- UI tests must verify:
+  - screen loads
+  - loading state
+  - empty state
+  - error state
+  - success state
+  - user actions trigger expected callbacks/events
+  - navigation events are emitted correctly
+  - accessibility labels exist for important controls
+
+## Snapshot Test Requirements
+
+- Snapshot tests must cover:
+  - light mode
+  - dark mode
+  - small device
+  - large device
+  - long text
+  - loading state
+  - empty state
+  - error state
+  - success state
+- Update snapshots only for intentional visual changes.
+
+## Test File Structure Guidelines
+
+Tests must mirror the primary feature structure inside the platform test source root. Test folders do not replace or flatten the runtime feature architecture.
+
+Compose:
+
+```text
+test/
+  feature/notes/
+    unit/
+    ui/
+    snapshot/
+```
+
+SwiftUI:
+
+```text
+Tests/
+  Features/Notes/
+    Unit/
+    UI/
+    Snapshot/
+```
+
+## Forbidden Testing Patterns
+
+- untested public functions
+- happy-path-only coverage
+- real network/database calls in unit tests
+- snapshot tests without state coverage
+- UI tests without accessibility selectors/labels
+- flaky time-based tests
+- direct private-function tests
+- over-mocking when a fake is simpler
+- missing ViewModel state transition coverage
 
 ## Naming Rules
 

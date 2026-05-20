@@ -10,12 +10,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import com.mohamedfaridelsherbini.vora.notes.NotesFeatureService
 import kotlinx.coroutines.delay
 
 private const val SplashHandoffDurationMs = 420L
 
 @Composable
-internal fun AppRoute() {
+internal fun AppRoute(
+    notesFeatureService: NotesFeatureService,
+) {
     var uiState by remember { mutableStateOf(AppUiState(showSplash = true)) }
 
     LaunchedEffect(Unit) {
@@ -26,15 +29,14 @@ internal fun AppRoute() {
     MaterialTheme {
         Surface {
             Crossfade(
-                targetState = uiState.showSplash,
+                targetState = uiState,
                 animationSpec = tween(durationMillis = 220),
                 label = "app-shell",
-            ) { splashVisible ->
-                if (splashVisible) {
-                    VoraSplashContent(state = splashVisualState())
-                } else {
-                    VoraHomeContent(state = homeVisualState())
-                }
+            ) { currentState ->
+                AppContent(
+                    uiState = currentState,
+                    notesFeatureService = notesFeatureService,
+                )
             }
         }
     }

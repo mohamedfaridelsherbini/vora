@@ -1,7 +1,12 @@
 package com.mohamedfaridelsherbini.vora.di
 
+private var isKoinInitialized = false
+
 class KoinIosBootstrap {
     fun start() {
-        initKoin()
+        if (!isKoinInitialized) {
+            initKoin()
+            isKoinInitialized = true
+        }
     }
 }

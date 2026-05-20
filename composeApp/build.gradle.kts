@@ -18,6 +18,7 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.androidx.activity.compose)
+            implementation(libs.androidx.compose.material.icons.extended)
             implementation(libs.androidx.core.splashscreen)
         }
         commonMain.dependencies {
@@ -66,5 +67,6 @@ android {
 
 dependencies {
     implementation(libs.koin.android)
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:${libs.versions.kotlinxCoroutines.get()}")
     debugImplementation(libs.compose.uiTooling)
 }

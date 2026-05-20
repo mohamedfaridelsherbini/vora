@@ -6,5 +6,6 @@ data class VoiceMemo(
     val audioPath: String,
     val durationMs: Long,
     val createdAt: Long,
+    val source: VoiceMemoSource = VoiceMemoSource.Phone,
     val transcript: String? = null,
 )
