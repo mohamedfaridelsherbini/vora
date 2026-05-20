@@ -35,9 +35,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mohamedfaridelsherbini.vora.notes.presentation.state.NotesSourceFilterUi
+import com.mohamedfaridelsherbini.vora.notes.presentation.state.NotesSyncStatus
 import com.mohamedfaridelsherbini.vora.presentation.theme.VoraColors
 import com.mohamedfaridelsherbini.vora.presentation.theme.VoraSpacing
-import com.mohamedfaridelsherbini.vora.presentation.theme.interFontFamily
+import com.mohamedfaridelsherbini.vora.presentation.theme.voraTypography
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
 
 @Composable
 internal fun NotesHeader(
@@ -45,6 +48,7 @@ internal fun NotesHeader(
     subtitleColor: Color,
     summaryText: String,
     statusLabel: String,
+    status: NotesSyncStatus,
     statusBackground: Color,
     statusTextColor: Color,
 ) {
@@ -52,9 +56,10 @@ internal fun NotesHeader(
         Text(
             text = "Notes",
             color = titleColor,
-            fontFamily = interFontFamily(),
-            fontWeight = FontWeight.Bold,
-            fontSize = 34.sp,
+            style = voraTypography().headlineLarge.copy(
+                fontWeight = FontWeight.Bold,
+                fontSize = 34.sp,
+            ),
         )
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -63,15 +68,16 @@ internal fun NotesHeader(
             Text(
                 text = summaryText,
                 color = subtitleColor,
-                fontFamily = interFontFamily(),
-                fontWeight = FontWeight.Medium,
-                fontSize = 12.sp,
+                style = voraTypography().bodySmall.copy(
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 12.sp,
+                ),
             )
             StatusChip(
                 label = statusLabel,
                 background = statusBackground,
                 textColor = statusTextColor,
-                icon = if (statusLabel == "Syncing") Icons.Outlined.Sync else Icons.Outlined.CheckCircle,
+                icon = if (status == NotesSyncStatus.Syncing) Icons.Outlined.Sync else Icons.Outlined.CheckCircle,
             )
         }
     }
@@ -89,9 +95,8 @@ internal fun NotesSearchBar(
     BasicTextField(
         value = query,
         onValueChange = onQueryChange,
-        textStyle = androidx.compose.ui.text.TextStyle(
+        textStyle = voraTypography().bodyMedium.copy(
             color = textColor.copy(alpha = 0.85f),
-            fontFamily = interFontFamily(),
             fontWeight = FontWeight.Medium,
             fontSize = 14.sp,
         ),
@@ -118,9 +123,10 @@ internal fun NotesSearchBar(
                         Text(
                             text = "Search transcripts",
                             color = iconColor.copy(alpha = 0.65f),
-                            fontFamily = interFontFamily(),
-                            fontWeight = FontWeight.Medium,
-                            fontSize = 14.sp,
+                            style = voraTypography().bodyMedium.copy(
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 14.sp,
+                            ),
                         )
                     }
                     innerTextField()
@@ -150,7 +156,10 @@ internal fun NotesFilterRow(
     textColor: Color,
     onSelect: (String) -> Unit,
 ) {
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+    Row(
+        modifier = Modifier.horizontalScroll(rememberScrollState()),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
         filters.forEach { filter ->
             FilterChip(
                 label = "${filter.label} ${filter.count}",
@@ -169,7 +178,10 @@ internal fun NotesLoadingFilterRow(
     background: Color,
     selectedBackground: Color,
 ) {
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+    Row(
+        modifier = Modifier.horizontalScroll(rememberScrollState()),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
         LoadingPill(width = 48.dp, background = selectedBackground)
         LoadingPill(width = 70.dp, background = background)
         LoadingPill(width = 82.dp, background = Color(0xFFF8ECE9))
@@ -181,9 +193,10 @@ internal fun NotesRecentLabel(textColor: Color) {
     Text(
         text = "RECENT",
         color = textColor,
-        fontFamily = interFontFamily(),
-        fontWeight = FontWeight.SemiBold,
-        fontSize = 11.sp,
+        style = voraTypography().labelSmall.copy(
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 11.sp,
+        ),
     )
 }
 
@@ -212,9 +225,10 @@ private fun StatusChip(
         Text(
             text = label,
             color = textColor,
-            fontFamily = interFontFamily(),
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 12.sp,
+            style = voraTypography().labelMedium.copy(
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 12.sp,
+            ),
         )
     }
 }
@@ -251,9 +265,10 @@ private fun FilterChip(
         Text(
             text = label,
             color = foreground,
-            fontFamily = interFontFamily(),
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 12.sp,
+            style = voraTypography().labelMedium.copy(
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 12.sp,
+            ),
         )
     }
 }
@@ -272,7 +287,7 @@ private fun LoadingPill(
 
 private fun NotesSourceFilterUi.icon(): ImageVector = when (key) {
     "phone" -> Icons.Outlined.PhoneAndroid
-    "smart" -> Icons.Outlined.Watch
+    "watch" -> Icons.Outlined.Watch
     "car" -> Icons.Outlined.DirectionsCar
     else -> Icons.Outlined.CheckCircle
 }

@@ -2,15 +2,17 @@ package com.mohamedfaridelsherbini.vora.notes
 
 import com.mohamedfaridelsherbini.vora.domain.model.VoiceMemo
 import com.mohamedfaridelsherbini.vora.domain.model.VoiceMemoSource
+import com.mohamedfaridelsherbini.vora.util.Clock
 
-class NotesSnapshotFactory {
+class NotesSnapshotFactory(private val clock: Clock) {
     fun create(
         memos: List<VoiceMemo>,
         selectedFilter: NotesSourceFilter,
         searchQuery: String,
     ): NotesSnapshot {
+        val now = clock.currentTimeMillis()
         val filters = selectedFilter.toFilterChips(memos)
-        val filteredMemos = memos.filterBy(selectedFilter).filterBySearch(searchQuery)
+        val filteredMemos = memos.filterBy(selectedFilter).filterBySearch(searchQuery, now)
 
         if (filteredMemos.isEmpty()) {
             return NotesSnapshot(
@@ -31,30 +33,30 @@ class NotesSnapshotFactory {
             selectedFilterKey = selectedFilter.key,
             searchQuery = searchQuery,
             filters = filters,
-            memos = filteredMemos.map(VoiceMemo::toNotesMemoItem),
+            memos = filteredMemos.map { it.toNotesMemoItem(now) },
         )
     }
 }
 
-private fun List<VoiceMemo>.filterBySearch(query: String): List<VoiceMemo> {
+private fun List<VoiceMemo>.filterBySearch(query: String, now: Long): List<VoiceMemo> {
     val trimmed = query.trim()
     if (trimmed.isEmpty()) return this
     return filter { memo ->
         memo.title.contains(trimmed, ignoreCase = true) ||
-            memo.createdAt.toCreatedAtLabel().contains(trimmed, ignoreCase = true)
+            memo.createdAt.toCreatedAtLabel(now).contains(trimmed, ignoreCase = true)
     }
 }
 
 private fun List<VoiceMemo>.filterBy(filter: NotesSourceFilter): List<VoiceMemo> = when (filter) {
     NotesSourceFilter.All -> this
     NotesSourceFilter.Phone -> filter { it.source == VoiceMemoSource.Phone }
-    NotesSourceFilter.Smart -> filter { it.source == VoiceMemoSource.Watch }
+    NotesSourceFilter.Watch -> filter { it.source == VoiceMemoSource.Watch }
     NotesSourceFilter.Car -> filter { it.source == VoiceMemoSource.Car }
 }
 
 private fun NotesSourceFilter.toFilterChips(memos: List<VoiceMemo>): List<NotesSourceFilterChip> {
     val phoneCount = memos.count { it.source == VoiceMemoSource.Phone }
-    val smartCount = memos.count { it.source == VoiceMemoSource.Watch }
+    val watchCount = memos.count { it.source == VoiceMemoSource.Watch }
     val carCount = memos.count { it.source == VoiceMemoSource.Car }
     return listOf(
         NotesSourceFilterChip(
@@ -70,10 +72,10 @@ private fun NotesSourceFilter.toFilterChips(memos: List<VoiceMemo>): List<NotesS
             selected = this == NotesSourceFilter.Phone,
         ),
         NotesSourceFilterChip(
-            key = NotesSourceFilter.Smart.key,
-            label = NotesSourceFilter.Smart.label,
-            count = smartCount,
-            selected = this == NotesSourceFilter.Smart,
+            key = NotesSourceFilter.Watch.key,
+            label = NotesSourceFilter.Watch.label,
+            count = watchCount,
+            selected = this == NotesSourceFilter.Watch,
         ),
         NotesSourceFilterChip(
             key = NotesSourceFilter.Car.key,
@@ -84,10 +86,10 @@ private fun NotesSourceFilter.toFilterChips(memos: List<VoiceMemo>): List<NotesS
     )
 }
 
-private fun VoiceMemo.toNotesMemoItem(): NotesMemoItem = NotesMemoItem(
+private fun VoiceMemo.toNotesMemoItem(now: Long): NotesMemoItem = NotesMemoItem(
     id = id,
     title = title,
     time = durationMs.toDurationLabel(),
-    subtitle = createdAt.toCreatedAtLabel(),
+    subtitle = createdAt.toCreatedAtLabel(now),
     source = source.displayName,
 )

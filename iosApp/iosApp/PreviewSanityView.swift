@@ -4,9 +4,9 @@ struct PreviewSanityView: View {
     var body: some View {
         VStack(spacing: 12) {
             Text("Vora Preview Sanity")
-                .font(.headline)
+                .font(.voraTitle)
             Text("If this renders, Preview runtime is healthy.")
-                .font(.subheadline)
+                .font(.voraBody)
                 .foregroundStyle(.secondary)
         }
         .padding(24)

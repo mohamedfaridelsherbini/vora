@@ -52,7 +52,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.mohamedfaridelsherbini.vora.notes.presentation.state.NoteListItemUi
 import com.mohamedfaridelsherbini.vora.presentation.theme.VoraColors
-import com.mohamedfaridelsherbini.vora.presentation.theme.interFontFamily
+import com.mohamedfaridelsherbini.vora.presentation.theme.voraTypography
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -98,17 +98,19 @@ internal fun VoraRenameBottomSheet(
         ) {
             Text(
                 text = "Rename memo",
-                fontFamily = interFontFamily(),
-                fontWeight = FontWeight.Bold,
-                fontSize = 18.sp,
+                style = voraTypography().titleMedium.copy(
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp,
+                ),
                 color = if (isDark) Color.White else VoraColors.LogoInk,
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = "Recorded ${memo.time} · ${memo.source} · ${memo.subtitle}",
-                fontFamily = interFontFamily(),
-                fontWeight = FontWeight.Medium,
-                fontSize = 12.sp,
+                style = voraTypography().bodySmall.copy(
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 12.sp,
+                ),
                 color = VoraColors.VoraMuted,
             )
 
@@ -133,8 +135,7 @@ internal fun VoraRenameBottomSheet(
                     focusedTextColor = if (isDark) Color.White else VoraColors.LogoInk,
                     unfocusedTextColor = if (isDark) Color.White else VoraColors.LogoInk,
                 ),
-                textStyle = androidx.compose.ui.text.TextStyle(
-                    fontFamily = interFontFamily(),
+                textStyle = voraTypography().bodyLarge.copy(
                     fontWeight = FontWeight.Medium,
                     fontSize = 15.sp,
                 ),
@@ -161,14 +162,16 @@ internal fun VoraRenameBottomSheet(
             ) {
                 Text(
                     text = "Names appear in the list and in transcripts.",
-                    fontFamily = interFontFamily(),
-                    fontSize = 12.sp,
+                    style = voraTypography().bodySmall.copy(
+                        fontSize = 12.sp,
+                    ),
                     color = VoraColors.VoraMuted,
                 )
                 Text(
                     text = "${fieldValue.text.length} / 80",
-                    fontFamily = interFontFamily(),
-                    fontSize = 12.sp,
+                    style = voraTypography().bodySmall.copy(
+                        fontSize = 12.sp,
+                    ),
                     color = VoraColors.VoraMuted,
                 )
             }
@@ -197,8 +200,9 @@ internal fun VoraRenameBottomSheet(
                 ) {
                     Text(
                         text = "Cancel",
-                        fontFamily = interFontFamily(),
-                        fontWeight = FontWeight.Medium,
+                        style = voraTypography().labelLarge.copy(
+                            fontWeight = FontWeight.Medium,
+                        ),
                         color = VoraColors.VoraMuted,
                     )
                 }
@@ -229,8 +233,9 @@ internal fun VoraRenameBottomSheet(
                         }
                         Text(
                             text = "Save",
-                            fontFamily = interFontFamily(),
-                            fontWeight = FontWeight.SemiBold,
+                            style = voraTypography().labelLarge.copy(
+                                fontWeight = FontWeight.SemiBold,
+                            ),
                             color = saveFg,
                         )
                     }
@@ -280,22 +285,24 @@ internal fun VoraDeleteDialog(
 
                 Text(
                     text = "Delete this memo?",
-                    fontFamily = interFontFamily(),
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp,
+                    style = voraTypography().titleMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp,
+                        textAlign = TextAlign.Center,
+                    ),
                     color = if (isDark) Color.White else VoraColors.LogoInk,
-                    textAlign = TextAlign.Center,
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
                     text = "${memo.title} · ${memo.subtitle} will be permanently removed from this device. This can't be undone.",
-                    fontFamily = interFontFamily(),
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 14.sp,
+                    style = voraTypography().bodyMedium.copy(
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 14.sp,
+                        textAlign = TextAlign.Center,
+                    ),
                     color = VoraColors.VoraMuted,
-                    textAlign = TextAlign.Center,
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -323,8 +330,9 @@ internal fun VoraDeleteDialog(
                         }
                         Text(
                             text = "Delete memo",
-                            fontFamily = interFontFamily(),
-                            fontWeight = FontWeight.SemiBold,
+                            style = voraTypography().labelLarge.copy(
+                                fontWeight = FontWeight.SemiBold,
+                            ),
                             color = Color.White,
                         )
                     }
@@ -345,8 +353,9 @@ internal fun VoraDeleteDialog(
                 ) {
                     Text(
                         text = "Cancel",
-                        fontFamily = interFontFamily(),
-                        fontWeight = FontWeight.Medium,
+                        style = voraTypography().labelLarge.copy(
+                            fontWeight = FontWeight.Medium,
+                        ),
                         color = if (isDark) Color.White else Color(0xFF1A1D20),
                     )
                 }

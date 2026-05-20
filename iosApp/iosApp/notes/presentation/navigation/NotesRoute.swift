@@ -2,26 +2,25 @@ import SwiftUI
 import Shared
 
 struct NotesRoute: View {
+    @StateObject private var viewModel: NotesViewModel
+
+    init(viewModel: @autoclosure @escaping () -> NotesViewModel) {
+        _viewModel = StateObject(wrappedValue: viewModel())
+    }
+
     var body: some View {
         if AppRuntime.isXcodePreview || AppRuntime.isRunningTests {
             NotesPreviewRoute()
         } else {
-            LiveNotesRoute(
-                bridge: IosDependencyResolver().notesBridge()
-            )
+            LiveNotesRoute(notesViewModel: viewModel)
         }
     }
 }
 
 private struct LiveNotesRoute: View {
     @State private var showSplash = true
-    @StateObject private var notesViewModel: NotesViewModel
+    @ObservedObject var notesViewModel: NotesViewModel
 
-    init(bridge: NotesBridge) {
-        _notesViewModel = StateObject(
-            wrappedValue: NotesViewModel(bridge: bridge)
-        )
-    }
 
     var body: some View {
         ZStack {
@@ -40,7 +39,8 @@ private struct LiveNotesRoute: View {
                     onSearchQueryChange: { query in notesViewModel.onAction(.updateSearchQuery(query)) },
                     onSelectSourceFilter: { key in notesViewModel.onAction(.selectSourceFilter(key)) },
                     onRenameMemo: { id in notesViewModel.onAction(.requestRename(id)) },
-                    onDeleteMemo: { id in notesViewModel.onAction(.requestDelete(id)) }
+                    onDeleteMemo: { id in notesViewModel.onAction(.requestDelete(id)) },
+                    onRetryLoad: { notesViewModel.onAction(.load) }
                 )
                 .transition(.opacity)
             }
@@ -90,6 +90,15 @@ private struct LiveNotesRoute: View {
                 .animation(.easeInOut, value: notesViewModel.deleteDialog != nil)
             }
         }
+        .alert(
+            "Error",
+            isPresented: Binding(
+                get: { notesViewModel.errorMessage != nil },
+                set: { isPresented in if !isPresented { notesViewModel.errorMessage = nil } }
+            ),
+            actions: { Button("OK", role: .cancel) {} },
+            message: { Text(notesViewModel.errorMessage ?? "") }
+        )
     }
 }
 
@@ -103,18 +112,19 @@ private struct NotesPreviewRoute: View {
             filters: [
                 NotesSourceFilterItem(key: "all", label: "All", count: 3, selected: true, iconName: nil),
                 NotesSourceFilterItem(key: "phone", label: "Phone", count: 2, selected: false, iconName: "iphone"),
-                NotesSourceFilterItem(key: "smart", label: "Smart", count: 1, selected: false, iconName: "sparkles")
+                NotesSourceFilterItem(key: "watch", label: "Watch", count: 1, selected: false, iconName: "applewatch")
             ],
             memos: [
                 MemoListItem(id: "preview-1", title: "Morning product notes", time: "09:42", subtitle: "Captured on iPhone", source: "Phone"),
-                MemoListItem(id: "preview-2", title: "Parking level reminder", time: "11:08", subtitle: "Smart summary ready", source: "Smart"),
+                MemoListItem(id: "preview-2", title: "Parking level reminder", time: "11:08", subtitle: "Captured on Watch", source: "Watch"),
                 MemoListItem(id: "preview-3", title: "Follow up with design", time: "14:31", subtitle: "Captured on iPhone", source: "Phone")
             ],
             onRecordClick: {},
             onSearchQueryChange: { _ in },
             onSelectSourceFilter: { _ in },
             onRenameMemo: { _ in },
-            onDeleteMemo: { _ in }
+            onDeleteMemo: { _ in },
+            onRetryLoad: {}
         )
     }
 }

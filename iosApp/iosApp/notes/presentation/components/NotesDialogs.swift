@@ -21,8 +21,7 @@ struct VoraRenameSheet: View {
                     .foregroundStyle(isDark ? Color.voraWhite : Color.voraLogoInk)
 
                 Text("Recorded \(memo.time) · \(memo.source) · \(memo.subtitle)")
-                    .font(.voraBody.weight(.medium))
-                    .font(.system(size: 12))
+                    .font(.voraLabel)
                     .foregroundStyle(Color.voraMuted)
             }
             .padding(.top, 4)
@@ -43,7 +42,7 @@ struct VoraRenameSheet: View {
                 if !text.isEmpty {
                     Button(action: { text = "" }) {
                         Image(systemName: "xmark")
-                            .font(.system(size: 14, weight: .bold))
+                            .font(.inter(size: 14, weight: .bold))
                             .foregroundColor(Color.voraMuted)
                             .padding(8)
                     }
@@ -61,11 +60,11 @@ struct VoraRenameSheet: View {
 
             HStack {
                 Text("Names appear in the list and in transcripts.")
-                    .font(.system(size: 12))
+                    .font(.voraBodySmall)
                     .foregroundStyle(Color.voraMuted)
                 Spacer()
                 Text("\(text.count) / 80")
-                    .font(.system(size: 12))
+                    .font(.voraBodySmall)
                     .foregroundStyle(Color.voraMuted)
             }
             .padding(.top, -12)
@@ -92,7 +91,7 @@ struct VoraRenameSheet: View {
                     HStack(spacing: 8) {
                         if isDark && canSave {
                             Image(systemName: "checkmark")
-                                .font(.system(size: 14, weight: .bold))
+                                .font(.inter(size: 14, weight: .bold))
                         }
                         Text("Save")
                             .font(.voraLabelLarge)
@@ -132,7 +131,7 @@ struct VoraDeleteModal: View {
                 .frame(width: 48, height: 48)
                 .overlay(
                     Image(systemName: "trash")
-                        .font(.system(size: 20))
+                        .font(.inter(size: 20))
                         .foregroundColor(Color.voraDanger)
                 )
                 .padding(.top, 24)
@@ -155,7 +154,7 @@ struct VoraDeleteModal: View {
                     HStack(spacing: 8) {
                         if isDark {
                             Image(systemName: "trash")
-                                .font(.system(size: 14, weight: .bold))
+                                .font(.inter(size: 14, weight: .bold))
                                 .foregroundColor(.white)
                         }
                         Text("Delete memo")

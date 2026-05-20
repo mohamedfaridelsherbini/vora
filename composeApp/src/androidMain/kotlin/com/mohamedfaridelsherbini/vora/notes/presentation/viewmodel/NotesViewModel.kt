@@ -5,11 +5,13 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.mohamedfaridelsherbini.vora.notes.NotesFeatureService
 import com.mohamedfaridelsherbini.vora.notes.NotesSnapshot
+import com.mohamedfaridelsherbini.vora.notes.NotesSnapshotMode
 import com.mohamedfaridelsherbini.vora.notes.presentation.action.NotesAction
 import com.mohamedfaridelsherbini.vora.notes.presentation.state.DeleteDialogState
 import com.mohamedfaridelsherbini.vora.notes.presentation.state.NoteListItemUi
 import com.mohamedfaridelsherbini.vora.notes.presentation.state.NotesListMode
 import com.mohamedfaridelsherbini.vora.notes.presentation.state.NotesSourceFilterUi
+import com.mohamedfaridelsherbini.vora.notes.presentation.state.NotesSyncStatus
 import com.mohamedfaridelsherbini.vora.notes.presentation.state.NotesUiState
 import com.mohamedfaridelsherbini.vora.notes.presentation.state.RenameDialogState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -131,13 +133,14 @@ internal class NotesViewModelFactory(
 }
 
 private fun NotesSnapshot.toUiState(): NotesUiState = NotesUiState(
-    mode = when (mode.name) {
-        "Loading" -> NotesListMode.Loading
-        "Empty" -> NotesListMode.Empty
-        else -> NotesListMode.Loaded
+    mode = when (mode) {
+        NotesSnapshotMode.Loading -> NotesListMode.Loading
+        NotesSnapshotMode.Empty -> NotesListMode.Empty
+        NotesSnapshotMode.Loaded -> NotesListMode.Loaded
     },
     summaryText = summaryText,
     statusLabel = statusLabel,
+    status = if (statusLabel == "Syncing") NotesSyncStatus.Syncing else NotesSyncStatus.Synced,
     searchQuery = searchQuery,
     filters = filters.map { filter ->
         NotesSourceFilterUi(

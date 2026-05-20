@@ -1,9 +1,10 @@
 import SwiftUI
 
-enum NotesScreenMode {
+enum NotesScreenMode: Equatable {
     case loading
     case empty
     case loaded
+    case error(message: String)
 }
 
 struct MemoListItem: Identifiable {

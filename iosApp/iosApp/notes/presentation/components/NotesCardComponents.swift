@@ -10,7 +10,7 @@ struct NotesEmptyStateCard: View {
     var body: some View {
         VStack(spacing: 10) {
             Image(systemName: "questionmark.circle")
-                .font(.system(size: 20, weight: .medium))
+                .font(.voraTitle)
                 .foregroundStyle(iconColor)
 
             Text("No voice memos yet")
@@ -21,6 +21,59 @@ struct NotesEmptyStateCard: View {
                 .font(.voraBody)
                 .foregroundStyle(subtitleColor)
                 .multilineTextAlignment(.center)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.horizontal, 22)
+        .padding(.vertical, 26)
+        .background(background)
+        .overlay(
+            RoundedRectangle(cornerRadius: 18)
+                .stroke(border, lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 18))
+    }
+}
+
+struct NotesErrorStateCard: View {
+    let message: String
+    let titleColor: Color
+    let subtitleColor: Color
+    let background: Color
+    let border: Color
+    let iconColor: Color
+    let onRetry: () -> Void
+
+    var body: some View {
+        VStack(spacing: 14) {
+            Image(systemName: "exclamationmark.triangle")
+                .font(.voraHeadlineSmall)
+                .foregroundStyle(Color(hex: 0xC95B4A))
+
+            Text("Failed to load memos")
+                .font(.voraTitle)
+                .foregroundStyle(titleColor)
+
+            Text(message)
+                .font(.voraBody)
+                .foregroundStyle(subtitleColor)
+                .multilineTextAlignment(.center)
+                .lineLimit(3)
+
+            Button(action: onRetry) {
+                HStack(spacing: 8) {
+                    Image(systemName: "arrow.clockwise")
+                        .font(.inter(size: 12, weight: .bold))
+                    Text("Retry")
+                        .font(.voraLabel)
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
+                .background(Color.voraLogoInk)
+                .foregroundStyle(.white)
+                .clipShape(Capsule())
+            }
+            .buttonStyle(.plain)
+            .padding(.top, 4)
         }
         .frame(maxWidth: .infinity)
         .padding(.horizontal, 22)
@@ -50,7 +103,7 @@ struct NotesLoadingStatusCard: View {
                     .stroke(border, lineWidth: 1)
                     .frame(width: 22, height: 22)
                 Image(systemName: "arrow.triangle.2.circlepath")
-                    .font(.system(size: 11, weight: .medium))
+                    .font(.voraLabelSmall)
                     .foregroundStyle(iconColor)
             }
 
@@ -163,18 +216,21 @@ struct RecordButton: View {
     let onClick: () -> Void
 
     var body: some View {
-        ZStack {
-            Circle()
-                .fill(Color(hex: 0xEF2B2A))
-                .frame(width: 64, height: 64)
+        Button(action: onClick) {
+            ZStack {
+                Circle()
+                    .fill(Color(hex: 0xEF2B2A))
+                    .frame(width: 64, height: 64)
 
-            Image(systemName: "mic.fill")
-                .font(.system(size: 22, weight: .semibold))
-                .foregroundStyle(.white)
+                Image(systemName: "mic.fill")
+                    .font(.inter(size: 22, weight: .semibold))
+                    .foregroundStyle(.white)
+            }
         }
-        .onTapGesture(perform: onClick)
+        .buttonStyle(.plain)
     }
 }
+
 
 struct LoadingPill: View {
     let width: CGFloat

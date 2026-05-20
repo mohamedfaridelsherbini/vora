@@ -13,6 +13,7 @@ struct NotesScreen: View {
     let onSelectSourceFilter: (String) -> Void
     let onRenameMemo: (String) -> Void
     let onDeleteMemo: (String) -> Void
+    let onRetryLoad: () -> Void
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -39,7 +40,8 @@ struct NotesScreen: View {
                     onSearchQueryChange: onSearchQueryChange,
                     onSelectSourceFilter: onSelectSourceFilter,
                     onRenameMemo: onRenameMemo,
-                    onDeleteMemo: onDeleteMemo
+                    onDeleteMemo: onDeleteMemo,
+                    onRetryLoad: onRetryLoad
                 )
             }
 
@@ -77,7 +79,8 @@ struct NotesScreen: View {
         onSearchQueryChange: { _ in },
         onSelectSourceFilter: { _ in },
         onRenameMemo: { _ in },
-        onDeleteMemo: { _ in }
+        onDeleteMemo: { _ in },
+        onRetryLoad: {}
     )
 }
 
@@ -93,7 +96,8 @@ struct NotesScreen: View {
         onSearchQueryChange: { _ in },
         onSelectSourceFilter: { _ in },
         onRenameMemo: { _ in },
-        onDeleteMemo: { _ in }
+        onDeleteMemo: { _ in },
+        onRetryLoad: {}
     )
     .preferredColorScheme(.dark)
 }
@@ -110,7 +114,8 @@ struct NotesScreen: View {
         onSearchQueryChange: { _ in },
         onSelectSourceFilter: { _ in },
         onRenameMemo: { _ in },
-        onDeleteMemo: { _ in }
+        onDeleteMemo: { _ in },
+        onRetryLoad: {}
     )
 }
 
@@ -126,7 +131,8 @@ struct NotesScreen: View {
         onSearchQueryChange: { _ in },
         onSelectSourceFilter: { _ in },
         onRenameMemo: { _ in },
-        onDeleteMemo: { _ in }
+        onDeleteMemo: { _ in },
+        onRetryLoad: {}
     )
     .preferredColorScheme(.dark)
 }
@@ -146,7 +152,8 @@ struct NotesScreen: View {
         onSearchQueryChange: { _ in },
         onSelectSourceFilter: { _ in },
         onRenameMemo: { _ in },
-        onDeleteMemo: { _ in }
+        onDeleteMemo: { _ in },
+        onRetryLoad: {}
     )
 }
 
@@ -165,7 +172,43 @@ struct NotesScreen: View {
         onSearchQueryChange: { _ in },
         onSelectSourceFilter: { _ in },
         onRenameMemo: { _ in },
-        onDeleteMemo: { _ in }
+        onDeleteMemo: { _ in },
+        onRetryLoad: {}
+    )
+    .preferredColorScheme(.dark)
+}
+
+#Preview("Notes Error") {
+    NotesScreen(
+        mode: .error(message: "Failed to connect to Vora bridge. Please verify your connection and try again."),
+        summaryText: "0 memos",
+        statusLabel: "Error",
+        searchQuery: "",
+        filters: [],
+        memos: [],
+        onRecordClick: {},
+        onSearchQueryChange: { _ in },
+        onSelectSourceFilter: { _ in },
+        onRenameMemo: { _ in },
+        onDeleteMemo: { _ in },
+        onRetryLoad: {}
+    )
+}
+
+#Preview("Notes Error Dark") {
+    NotesScreen(
+        mode: .error(message: "Failed to connect to Vora bridge. Please verify your connection and try again."),
+        summaryText: "0 memos",
+        statusLabel: "Error",
+        searchQuery: "",
+        filters: [],
+        memos: [],
+        onRecordClick: {},
+        onSearchQueryChange: { _ in },
+        onSelectSourceFilter: { _ in },
+        onRenameMemo: { _ in },
+        onDeleteMemo: { _ in },
+        onRetryLoad: {}
     )
     .preferredColorScheme(.dark)
 }
@@ -174,7 +217,7 @@ private func previewFilters(selected: String) -> [NotesSourceFilterItem] {
     [
         NotesSourceFilterItem(key: "all",   label: "All",   count: 12, selected: selected == "all",   iconName: nil),
         NotesSourceFilterItem(key: "phone", label: "Phone", count: 7,  selected: selected == "phone", iconName: "iphone"),
-        NotesSourceFilterItem(key: "smart", label: "Smart", count: 3,  selected: selected == "smart", iconName: "sparkles"),
+        NotesSourceFilterItem(key: "watch", label: "Watch", count: 3,  selected: selected == "watch", iconName: "applewatch"),
         NotesSourceFilterItem(key: "car",   label: "Car",   count: 2,  selected: selected == "car",   iconName: "car.fill"),
     ]
 }

@@ -1,7 +1,9 @@
 package com.mohamedfaridelsherbini.vora.notes
 
+import org.koin.mp.KoinPlatform
+
 class IosNotesBridge(
-    private val notesFeatureService: NotesFeatureService,
+    private val notesFeatureService: NotesFeatureService = KoinPlatform.getKoin().get(),
 ) {
 
     suspend fun loadSnapshot(): NotesSnapshot = notesFeatureService.loadSnapshot()

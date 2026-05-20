@@ -11,11 +11,11 @@ struct WatchCaptureSplashView: View {
                 .frame(width: 54, height: 68)
 
             Text("vora")
-                .font(.system(size: 24, weight: .bold, design: .rounded))
+                .font(.voraWatchHeadlineSmall)
                 .foregroundStyle(Color(red: 0.976, green: 0.980, blue: 0.984))
 
             Text("Speak to capture")
-                .font(.system(size: 11, weight: .medium, design: .rounded))
+                .font(.voraWatchCaption.weight(.medium))
                 .foregroundStyle(Color(red: 0.612, green: 0.639, blue: 0.686))
 
             Circle()
@@ -32,3 +32,4 @@ struct WatchCaptureSplashView: View {
         }
     }
 }
+

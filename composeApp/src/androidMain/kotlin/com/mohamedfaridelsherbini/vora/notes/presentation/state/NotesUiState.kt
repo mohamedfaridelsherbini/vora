@@ -34,10 +34,16 @@ internal data class DeleteDialogState(
     val memo: NoteListItemUi,
 )
 
+internal enum class NotesSyncStatus {
+    Syncing,
+    Synced,
+}
+
 internal data class NotesUiState(
     val mode: NotesListMode,
     val summaryText: String,
     val statusLabel: String,
+    val status: NotesSyncStatus = if (statusLabel == "Syncing") NotesSyncStatus.Syncing else NotesSyncStatus.Synced,
     val searchQuery: String,
     val filters: List<NotesSourceFilterUi>,
     val memos: List<NoteListItemUi>,
@@ -52,6 +58,7 @@ internal data class NotesListVisualState(
     val subtitleColor: Color,
     val summaryText: String,
     val statusLabel: String,
+    val status: NotesSyncStatus,
     val statusChipBackground: Color,
     val statusChipTextColor: Color,
     val filterChipBackground: Color,
@@ -81,14 +88,15 @@ internal fun NotesUiState.toVisualState(dark: Boolean): NotesListVisualState = N
     subtitleColor = if (dark) VoraColors.VoraMuted.copy(alpha = 0.72f) else VoraColors.VoraMuted,
     summaryText = summaryText,
     statusLabel = statusLabel,
+    status = status,
     statusChipBackground = when {
-        dark && statusLabel == "Syncing" -> Color(0xFF1D2736)
+        dark && status == NotesSyncStatus.Syncing -> Color(0xFF1D2736)
         dark -> Color(0xFF2F6A4F)
-        statusLabel == "Syncing" -> Color(0xFFDDEBED)
+        status == NotesSyncStatus.Syncing -> Color(0xFFDDEBED)
         else -> Color(0xFF3A7D58)
     },
     statusChipTextColor = when {
-        statusLabel == "Syncing" -> if (dark) VoraColors.LogoPaper else VoraColors.Tertiary
+        status == NotesSyncStatus.Syncing -> if (dark) VoraColors.LogoPaper else VoraColors.Tertiary
         else -> VoraColors.LogoPaper
     },
     filterChipBackground = if (dark) Color(0xFF1D2736) else Color(0xFFEFF4F7),
@@ -125,7 +133,7 @@ internal fun previewLoadedNotesUiState(): NotesUiState = NotesUiState(
     filters = listOf(
         NotesSourceFilterUi("all", "All", 12, true),
         NotesSourceFilterUi("phone", "Phone", 7, false),
-        NotesSourceFilterUi("smart", "Smart", 3, false),
+        NotesSourceFilterUi("watch", "Watch", 3, false),
         NotesSourceFilterUi("car", "Car", 2, false),
     ),
     memos = listOf(
@@ -142,7 +150,7 @@ internal fun previewEmptyNotesUiState(): NotesUiState = NotesUiState(
     filters = listOf(
         NotesSourceFilterUi("all", "All", 0, true),
         NotesSourceFilterUi("phone", "Phone", 0, false),
-        NotesSourceFilterUi("smart", "Smart", 0, false),
+        NotesSourceFilterUi("watch", "Watch", 0, false),
         NotesSourceFilterUi("car", "Car", 0, false),
     ),
     memos = emptyList(),
@@ -156,7 +164,7 @@ internal fun previewLoadingNotesUiState(): NotesUiState = NotesUiState(
     filters = listOf(
         NotesSourceFilterUi("all", "All", 0, true),
         NotesSourceFilterUi("phone", "Phone", 0, false),
-        NotesSourceFilterUi("smart", "Smart", 0, false),
+        NotesSourceFilterUi("watch", "Watch", 0, false),
         NotesSourceFilterUi("car", "Car", 0, false),
     ),
     memos = emptyList(),

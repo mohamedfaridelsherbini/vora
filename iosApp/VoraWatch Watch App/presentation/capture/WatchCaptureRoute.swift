@@ -14,9 +14,13 @@ struct WatchCaptureRoute: View {
             }
         }
         .task {
-            try? await Task.sleep(for: .milliseconds(420))
-            withAnimation(.easeInOut(duration: 0.2)) {
-                showSplash = false
+            do {
+                try await Task.sleep(for: .milliseconds(420))
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    showSplash = false
+                }
+            } catch {
+                // Task was cancelled, return early without mutating state
             }
         }
     }

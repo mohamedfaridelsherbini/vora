@@ -36,7 +36,7 @@ struct NotesSearchBar: View {
     var body: some View {
         HStack(spacing: 10) {
             Image(systemName: "magnifyingglass")
-                .font(.system(size: 14, weight: .semibold))
+                .font(.inter(size: 14, weight: .semibold))
                 .foregroundStyle(textColor.opacity(0.65))
 
             TextField("Search transcripts", text: $query)
@@ -71,18 +71,19 @@ struct NotesFilterRow: View {
     var body: some View {
         HStack(spacing: 8) {
             ForEach(filters) { filter in
-                FilterChip(
-                    label: "\(filter.label) \(filter.count)",
-                    selected: filter.selected,
-                    iconName: filter.iconName
-                )
-                .onTapGesture {
-                    onSelect(filter.key)
+                Button(action: { onSelect(filter.key) }) {
+                    FilterChip(
+                        label: "\(filter.label) \(filter.count)",
+                        selected: filter.selected,
+                        iconName: filter.iconName
+                    )
                 }
+                .buttonStyle(.plain)
             }
         }
     }
 }
+
 
 struct NotesLoadingFilterRow: View {
     let background: Color
@@ -118,7 +119,7 @@ struct FilterChip: View {
         HStack(spacing: 6) {
             if let iconName {
                 Image(systemName: iconName)
-                    .font(.system(size: 11, weight: .semibold))
+                    .font(.inter(size: 11, weight: .semibold))
             }
             Text(label)
                 .font(.voraLabel)
@@ -141,7 +142,7 @@ struct StatusChip: View {
         HStack(spacing: 6) {
             if let iconName {
                 Image(systemName: iconName)
-                    .font(.system(size: 11, weight: .semibold))
+                    .font(.inter(size: 11, weight: .semibold))
             }
             Text(label)
                 .font(.voraLabel)

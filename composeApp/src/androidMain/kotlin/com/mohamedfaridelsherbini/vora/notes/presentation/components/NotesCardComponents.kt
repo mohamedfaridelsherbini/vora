@@ -36,7 +36,7 @@ import androidx.compose.ui.unit.sp
 import com.mohamedfaridelsherbini.vora.notes.presentation.state.NoteListItemUi
 import com.mohamedfaridelsherbini.vora.presentation.theme.VoraColors
 import com.mohamedfaridelsherbini.vora.presentation.theme.VoraSpacing
-import com.mohamedfaridelsherbini.vora.presentation.theme.interFontFamily
+import com.mohamedfaridelsherbini.vora.presentation.theme.voraTypography
 
 @Composable
 internal fun NotesEmptyStateCard(
@@ -65,16 +65,18 @@ internal fun NotesEmptyStateCard(
         Text(
             text = "No voice memos yet",
             color = titleColor,
-            fontFamily = interFontFamily(),
-            fontWeight = FontWeight.Bold,
-            fontSize = 16.sp,
+            style = voraTypography().titleMedium.copy(
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp,
+            ),
         )
         Text(
             text = "Tap record to capture your first thought.",
             color = subtitleColor,
-            fontFamily = interFontFamily(),
-            fontWeight = FontWeight.Medium,
-            fontSize = 14.sp,
+            style = voraTypography().bodyMedium.copy(
+                fontWeight = FontWeight.Medium,
+                fontSize = 14.sp,
+            ),
         )
     }
 }
@@ -119,16 +121,18 @@ internal fun NotesLoadingStatusCard(
             Text(
                 text = "Restoring recent memos",
                 color = titleColor,
-                fontFamily = interFontFamily(),
-                fontWeight = FontWeight.Bold,
-                fontSize = 14.sp,
+                style = voraTypography().titleSmall.copy(
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 14.sp,
+                ),
             )
             Text(
                 text = "Checking local files before cloud sync.",
                 color = subtitleColor,
-                fontFamily = interFontFamily(),
-                fontWeight = FontWeight.Medium,
-                fontSize = 12.sp,
+                style = voraTypography().bodySmall.copy(
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 12.sp,
+                ),
             )
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 LoadingLine(width = 56.dp, height = 5.dp, color = accentColor)
@@ -193,24 +197,27 @@ internal fun MemoCard(
                 Text(
                     text = memo.title,
                     color = titleColor,
-                    fontFamily = interFontFamily(),
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 24.sp,
+                    style = voraTypography().headlineSmall.copy(
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 24.sp,
+                    ),
                 )
                 Text(
                     text = memo.subtitle,
                     color = metaColor,
-                    fontFamily = interFontFamily(),
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 12.sp,
+                    style = voraTypography().bodySmall.copy(
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 12.sp,
+                    ),
                 )
             }
             Text(
                 text = memo.time,
                 color = metaColor,
-                fontFamily = interFontFamily(),
-                fontWeight = FontWeight.Medium,
-                fontSize = 12.sp,
+                style = voraTypography().bodySmall.copy(
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 12.sp,
+                ),
             )
         }
         Row(
@@ -276,9 +283,10 @@ private fun SourceChip(
         Text(
             text = label,
             color = textColor,
-            fontFamily = interFontFamily(),
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 12.sp,
+            style = voraTypography().labelMedium.copy(
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 12.sp,
+            ),
         )
     }
 }

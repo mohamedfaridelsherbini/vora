@@ -9,6 +9,7 @@ import com.mohamedfaridelsherbini.vora.domain.repository.VoiceMemoRepository
 import com.mohamedfaridelsherbini.vora.mock.VoiceMemoMockFactory
 import com.mohamedfaridelsherbini.vora.notes.NotesFeatureService
 import com.mohamedfaridelsherbini.vora.notes.NotesSnapshotFactory
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
 private class DefaultSharedFoundationDependencies(
@@ -18,8 +19,9 @@ private class DefaultSharedFoundationDependencies(
 ) : SharedFoundationDependencies
 
 val sharedFoundationModule = module {
+    single(named("isDemoMode")) { true }
     single { VoiceMemoMockFactory() }
-    single { NotesSnapshotFactory() }
+    single { NotesSnapshotFactory(get()) }
     single<VoiceMemoRepository> { RoomVoiceMemoRepository(get()) }
     single<AudioRecorderRepository> { BootstrapAudioRecorderRepository() }
     single<AudioPlayerRepository> { BootstrapAudioPlayerRepository() }
@@ -32,5 +34,6 @@ val sharedFoundationModule = module {
     }
     single { SharedFoundationGraph(get()) }
     single { get<SharedFoundationGraph>().voiceMemo }
-    single { NotesFeatureService(get(), get(), get()) }
+    factory { NotesFeatureService(get(), get(), get(), get(), get(), get(named("isDemoMode"))) }
 }
+

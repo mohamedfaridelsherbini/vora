@@ -40,7 +40,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mohamedfaridelsherbini.vora.presentation.theme.VoraColors
-import com.mohamedfaridelsherbini.vora.presentation.theme.interFontFamily
+import com.mohamedfaridelsherbini.vora.presentation.theme.voraTypography
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
@@ -66,9 +66,10 @@ private fun ActionBlock(
         Text(
             text = text,
             color = Color.White,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Medium,
-            fontFamily = interFontFamily(),
+            style = voraTypography().bodySmall.copy(
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Medium,
+            ),
         )
     }
 }

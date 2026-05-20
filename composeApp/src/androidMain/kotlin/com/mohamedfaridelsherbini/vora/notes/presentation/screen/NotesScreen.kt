@@ -128,6 +128,7 @@ private fun NotesListContent(
                 subtitleColor = state.subtitleColor,
                 summaryText = state.summaryText,
                 statusLabel = state.statusLabel,
+                status = state.status,
                 statusBackground = state.statusChipBackground,
                 statusTextColor = state.statusChipTextColor,
             )

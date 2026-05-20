@@ -23,6 +23,7 @@ struct NotesContentView: View {
     let onSelectSourceFilter: (String) -> Void
     let onRenameMemo: (String) -> Void
     let onDeleteMemo: (String) -> Void
+    let onRetryLoad: () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -46,6 +47,8 @@ struct NotesContentView: View {
                 loadingContent
             } else if mode == .empty {
                 emptyContent
+            } else if case .error(let message) = mode {
+                errorContent(message: message)
             } else {
                 loadedContent
             }
@@ -91,6 +94,19 @@ struct NotesContentView: View {
             background: emptyStateBackground,
             border: emptyStateBorder,
             iconColor: emptyStateIconColor
+        )
+        .padding(.top, 96)
+    }
+
+    private func errorContent(message: String) -> some View {
+        NotesErrorStateCard(
+            message: message,
+            titleColor: titleColor,
+            subtitleColor: metaColor,
+            background: emptyStateBackground,
+            border: emptyStateBorder,
+            iconColor: emptyStateIconColor,
+            onRetry: onRetryLoad
         )
         .padding(.top, 96)
     }

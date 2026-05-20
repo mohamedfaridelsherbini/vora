@@ -10,7 +10,7 @@ private struct ActionBlock: View {
         Button(action: action) {
             VStack(spacing: 4) {
                 Image(systemName: iconName)
-                    .font(.system(size: 14, weight: .semibold))
+                    .font(.inter(size: 14, weight: .semibold))
                     .foregroundColor(.white)
                 Text(text)
                     .font(.voraLabel)
@@ -72,8 +72,15 @@ struct SwipeRevealContainer<Content: View>: View {
                             }
                         }
                 )
+                .accessibilityAction(named: "Rename") {
+                    onRename()
+                }
+                .accessibilityAction(named: "Delete") {
+                    onDelete()
+                }
         }
     }
+
 
     private func closeSwipe() {
         withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {

@@ -19,7 +19,7 @@ internal fun Long.toMinutesLabel(): String {
     return "$totalMinutes min"
 }
 
-internal fun Long.toCreatedAtLabel(now: Long = currentTimeMillis()): String {
+internal fun Long.toCreatedAtLabel(now: Long): String {
     val zone = TimeZone.currentSystemDefault()
     val created = kotlin.time.Instant.fromEpochMilliseconds(this).toLocalDateTime(zone)
     val current = kotlin.time.Instant.fromEpochMilliseconds(now).toLocalDateTime(zone)
@@ -30,7 +30,7 @@ internal fun Long.toCreatedAtLabel(now: Long = currentTimeMillis()): String {
         createdDate == currentDate.minus(DatePeriod(days = 1)) -> "Yesterday"
         else -> createdDate.dayLabel()
     }
-    val time = "${created.hour}:${created.minute.toString().padStart(2, '0')}"
+    val time = "${created.hour.toString().padStart(2, '0')}:${created.minute.toString().padStart(2, '0')}"
     return "$prefix, $time"
 }
 

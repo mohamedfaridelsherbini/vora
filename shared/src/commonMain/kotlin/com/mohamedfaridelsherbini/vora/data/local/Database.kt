@@ -1,12 +1,15 @@
 package com.mohamedfaridelsherbini.vora.data.local
 
 import androidx.room.RoomDatabase
-import androidx.sqlite.driver.bundled.BundledSQLiteDriver
-import kotlinx.coroutines.Dispatchers
+import androidx.sqlite.SQLiteDriver
+import kotlin.coroutines.CoroutineContext
 
 fun getRoomDatabase(
     builder: RoomDatabase.Builder<VoraRoomDatabase>,
+    driver: SQLiteDriver,
+    queryContext: CoroutineContext,
 ): VoraRoomDatabase = builder
-    .setDriver(BundledSQLiteDriver())
-    .setQueryCoroutineContext(Dispatchers.Default)
+    .setDriver(driver)
+    .setQueryCoroutineContext(queryContext)
     .build()
+

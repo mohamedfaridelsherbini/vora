@@ -22,23 +22,45 @@ final class NotesViewModel: ObservableObject {
     @Published var searchQuery: String = ""
     @Published var renameDialog: RenameDialogState? = nil
     @Published var deleteDialog: DeleteDialogState? = nil
+    @Published var errorMessage: String? = nil
 
     private let bridge: NotesBridge
+    private var loadSequenceNumber = 0
+    private var activeLoadTask: Task<Void, Never>?
 
     init(bridge: NotesBridge) {
         self.bridge = bridge
     }
 
+    #if DEBUG
+    convenience init() {
+        struct DummyBridge: NotesBridge {
+            func loadSnapshot() async throws -> NotesSnapshot {
+                NotesSnapshot(mode: .empty, summaryText: "0 memos", statusLabel: "Synced", selectedFilterKey: "all", searchQuery: "", filters: [], memos: [])
+            }
+            func insertMemo() async throws {}
+            func renameMemo(id: String, newTitle: String) async throws {}
+            func deleteMemo(id: String) async throws {}
+            func selectSourceFilter(key: String) {}
+            func updateSearchQuery(query: String) {}
+        }
+        self.init(bridge: DummyBridge())
+    }
+    #endif
+
     func onAction(_ action: NotesAction) {
         switch action {
         case .load:
-            Task { await load() }
+            activeLoadTask?.cancel()
+            activeLoadTask = Task { await load() }
         case .insertMemo:
             Task { await insertMemo() }
         case let .updateSearchQuery(query):
-            Task { await updateSearchQuery(query) }
+            activeLoadTask?.cancel()
+            activeLoadTask = Task { await updateSearchQuery(query) }
         case let .selectSourceFilter(key):
-            Task { await selectSourceFilter(key: key) }
+            activeLoadTask?.cancel()
+            activeLoadTask = Task { await selectSourceFilter(key: key) }
         case let .requestRename(id):
             requestRename(id: id)
         case let .confirmRename(newTitle):
@@ -55,20 +77,30 @@ final class NotesViewModel: ObservableObject {
     }
 
     func load() async {
-        guard let snapshot = try? await bridge.loadSnapshot() else {
-            mode = .empty
-            summaryText = "0 memos"
-            statusLabel = "Synced"
+        loadSequenceNumber += 1
+        let currentSequence = loadSequenceNumber
+        do {
+            let snapshot = try await bridge.loadSnapshot()
+            guard currentSequence == loadSequenceNumber else { return }
+            apply(snapshot: snapshot)
+        } catch {
+            guard currentSequence == loadSequenceNumber else { return }
+            mode = .error(message: error.localizedDescription)
+            summaryText = "Error loading library"
+            statusLabel = "Error"
             searchQuery = ""
             memos = []
-            return
         }
-        apply(snapshot: snapshot)
     }
 
+
     func insertMemo() async {
-        _ = try? await bridge.insertMemo()
-        await load()
+        do {
+            try await bridge.insertMemo()
+            await load()
+        } catch {
+            errorMessage = "Failed to create memo: \(error.localizedDescription)"
+        }
     }
 
     // ── Rename ──────────────────────────────────────────────────────────────
@@ -81,8 +113,12 @@ final class NotesViewModel: ObservableObject {
     func confirmRename(newTitle: String) async {
         guard let dialog = renameDialog else { return }
         renameDialog = nil
-        _ = try? await bridge.renameMemo(id: dialog.memo.id, newTitle: newTitle)
-        await load()
+        do {
+            try await bridge.renameMemo(id: dialog.memo.id, newTitle: newTitle)
+            await load()
+        } catch {
+            errorMessage = "Failed to rename memo: \(error.localizedDescription)"
+        }
     }
 
     func dismissRename() {
@@ -99,8 +135,12 @@ final class NotesViewModel: ObservableObject {
     func confirmDelete() async {
         guard let dialog = deleteDialog else { return }
         deleteDialog = nil
-        _ = try? await bridge.deleteMemo(id: dialog.memo.id)
-        await load()
+        do {
+            try await bridge.deleteMemo(id: dialog.memo.id)
+            await load()
+        } catch {
+            errorMessage = "Failed to delete memo: \(error.localizedDescription)"
+        }
     }
 
     func dismissDelete() {
@@ -163,7 +203,6 @@ private func iconName(for key: String) -> String? {
     case "phone": return "iphone"
     case "watch": return "applewatch"
     case "car":   return "car.fill"
-    case "smart": return "sparkles"
     default:      return nil
     }
 }
